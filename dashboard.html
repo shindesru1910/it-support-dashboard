@@ -2039,8 +2039,13 @@ function setupUpload(){
   const zone = document.getElementById('drop-zone');
   const inp  = document.getElementById('file-input');
 
-  zone.addEventListener('click', e => { if(e.target.id !== 'dl-sample-btn') openFilePicker(); });
-  document.getElementById('browse-link').addEventListener('click', openFilePicker);
+  zone.addEventListener('click', e => {
+    // dl-sample-btn stops propagation itself; ignore any other non-zone-level elements
+    // browse-link is intentionally NOT given its own listener — this handler covers it
+    if(e.target.id === 'dl-sample-btn') return;
+    e.stopPropagation();
+    openFilePicker();
+  });
   document.getElementById('btn-upload-hdr').addEventListener('click', () => {
     document.getElementById('upload-wrap').style.display = '';
     document.getElementById('upload-wrap').scrollIntoView({behavior:'smooth'});
