@@ -8,6 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -331,12 +332,12 @@ tbody td{padding:10px 14px;white-space:nowrap}
 
 <!-- Upload zone -->
 <div id="upload-wrap">
-  <input type="file" id="file-input" accept=".csv" hidden>
+  <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
   <div id="drop-zone">
     <span class="drop-icon">📤</span>
     <h3>Drop your CSV file here</h3>
     <p>or <span class="click-link" id="browse-link">click to browse</span></p>
-    <p class="drop-hint">Supports .csv · Any column names · Auto-detects fields</p>
+    <p class="drop-hint">Supports .csv, .xlsx, .xls · Any column names · Auto-detects fields</p>
     <div class="drop-actions">
       <button class="btn btn-sm" id="dl-sample-btn">⬇ Download Sample CSV</button>
     </div>
@@ -1962,37 +1963,72 @@ function setupAISection(tickets){
 // ─────────────────────────────────────────────────────────
 function openFilePicker(){ document.getElementById('file-input').click(); }
 
-function handleFile(file){
-  if(!file || !file.name.endsWith('.csv')){
-    toast('Please select a .csv file','error'); return;
+// Shared post-parse pipeline for both CSV and Excel
+function processAndLoad(headers, rows, filename){
+  if(!rows.length){ toast('File appears to be empty','error'); return; }
+  const mapping = smartAutoDetect(headers, rows);
+  currentMapping    = mapping;
+  pendingCSVHeaders = headers;
+  pendingCSVRows    = rows;
+  pendingFilename   = filename;
+  const tickets = processRows(rows, mapping);
+  if(!tickets.length){
+    toast('No parseable rows found — check the date column or try Re-map Columns','error');
+    return;
   }
+  showMappingToast(mapping, filename, headers);
+  loadDashboard(tickets, false, filename, rows.length, headers);
+}
+
+function parseCSVFile(file){
   showSpinner('Parsing CSV…');
   const reader = new FileReader();
   reader.onload = e => {
     hideSpinner();
     const result = Papa.parse(e.target.result, { header:true, skipEmptyLines:true, dynamicTyping:false });
     if(!result.data.length){ toast('CSV appears to be empty','error'); return; }
-    const headers = result.meta.fields || [];
-    const rows = result.data;
-
-    // Smart detect — no popup needed
-    const mapping = smartAutoDetect(headers, rows);
-    currentMapping  = mapping;
-    pendingCSVHeaders = headers;
-    pendingCSVRows    = rows;
-    pendingFilename   = file.name;
-
-    const tickets = processRows(rows, mapping);
-    if(!tickets.length){
-      toast('No parseable rows found — check the date column or try Re-map Columns','error');
-      return;
-    }
-
-    showMappingToast(mapping, file.name, headers);
-    loadDashboard(tickets, false, file.name, rows.length, headers);
+    processAndLoad(result.meta.fields || [], result.data, file.name);
   };
   reader.onerror = () => { hideSpinner(); toast('Could not read file','error'); };
   reader.readAsText(file);
+}
+
+function parseExcelFile(file){
+  showSpinner('Parsing Excel…');
+  const reader = new FileReader();
+  reader.onload = e => {
+    hideSpinner();
+    try {
+      const wb = XLSX.read(e.target.result, { type:'array', raw:false });
+      if(!wb.SheetNames.length){ toast('Excel file contains no sheets','error'); return; }
+      const ws = wb.Sheets[wb.SheetNames[0]];
+
+      // Get rows as header-keyed objects; raw:false formats dates/numbers as strings
+      const rawData = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
+      if(!rawData.length){ toast('First sheet appears to be empty','error'); return; }
+
+      const headers = Object.keys(rawData[0]);
+      // Coerce all values to strings (matches Papa Parse behaviour)
+      const rows = rawData.map(row => {
+        const out = {};
+        headers.forEach(h => { out[h] = row[h] !== undefined ? String(row[h]) : ''; });
+        return out;
+      });
+      processAndLoad(headers, rows, file.name);
+    } catch(err) {
+      toast('Could not read Excel file: ' + err.message, 'error');
+    }
+  };
+  reader.onerror = () => { hideSpinner(); toast('Could not read file','error'); };
+  reader.readAsArrayBuffer(file);
+}
+
+function handleFile(file){
+  if(!file) return;
+  const n = file.name.toLowerCase();
+  if(n.endsWith('.csv'))               parseCSVFile(file);
+  else if(n.endsWith('.xlsx') || n.endsWith('.xls')) parseExcelFile(file);
+  else toast('Please select a .csv, .xlsx, or .xls file','error');
 }
 
 function setupUpload(){
