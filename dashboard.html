@@ -1961,7 +1961,11 @@ function setupAISection(tickets){
 // ─────────────────────────────────────────────────────────
 // UPLOAD HANDLING
 // ─────────────────────────────────────────────────────────
-function openFilePicker(){ document.getElementById('file-input').click(); }
+function openFilePicker(){
+  const inp = document.getElementById('file-input');
+  inp.value = ''; // reset before opening so the change event always fires
+  inp.click();
+}
 
 // Shared post-parse pipeline for both CSV and Excel
 function processAndLoad(headers, rows, filename){
@@ -2043,7 +2047,19 @@ function setupUpload(){
     openFilePicker();
   });
   document.getElementById('demo-upload-btn').addEventListener('click', openFilePicker);
-  inp.addEventListener('change', e => { if(e.target.files[0]) handleFile(e.target.files[0]); inp.value=''; });
+  // Guard prevents double-firing if both 'change' and 'input' trigger for the same selection
+  let _filePickBusy = false;
+  function onFileChosen(){
+    if(_filePickBusy) return;
+    const file = inp.files && inp.files[0];
+    if(!file) return;
+    _filePickBusy = true;
+    handleFile(file);
+    inp.value = ''; // reset so re-selecting the same file always fires the event
+    requestAnimationFrame(() => { _filePickBusy = false; });
+  }
+  inp.addEventListener('change', onFileChosen);
+  inp.addEventListener('input',  onFileChosen); // fallback for browsers that skip 'change'
 
   zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
   zone.addEventListener('dragleave', () => zone.classList.remove('over'));
