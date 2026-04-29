@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -776,6 +777,7 @@ updateChartDefaults();
 function pad(n){ return String(n).padStart(2,'0'); }
 function toDateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
 function sanitizeId(s){ return s.replace(/\W+/g,'_').toLowerCase(); }
+function truncLabel(s, maxLen){ return s.length > maxLen ? s.slice(0, maxLen-1) + '…' : s; }
 
 function parseDate(s){
   if(!s) return null;
@@ -1872,7 +1874,8 @@ function makeTimeSeriesChart(rows, sch, grid){
     data:{labels,datasets:[{label:'Records',data,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,.12)',tension:.35,fill:true,pointRadius:data.length<=30?4:2,pointBackgroundColor:'#6366f1',borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,
       onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} records`}}},
+      plugins:{legend:{display:false},datalabels:{display:false},
+        tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y.toLocaleString()} records`}}},
       scales:{x:{grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8',maxRotation:30,maxTicksLimit:14}},y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}}}}
   }, title);
 }
@@ -1898,8 +1901,14 @@ function makeStatusChart(rows, sch, grid){
     options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
       onClick:(e,els)=>{ if(els.length) applyDrilldown(sch.statusCol, labels[els[0].index]); },
       onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
-      plugins:{legend:{position:'bottom',labels:{padding:14,color:'#94a3b8',usePointStyle:true,pointStyle:'circle'}},
-        tooltip:{...TT,callbacks:{label:c=>` ${c.parsed} (${((c.parsed/total)*100).toFixed(1)}%)`}}}}
+      plugins:{
+        legend:{position:'bottom',labels:{padding:14,color:'#94a3b8',usePointStyle:true,pointStyle:'circle'}},
+        datalabels:{display:false},
+        tooltip:{...TT,callbacks:{
+          title:(items)=>[labels[items[0].dataIndex]],
+          label:(c)=>` ${c.parsed.toLocaleString()} records · ${((c.parsed/total)*100).toFixed(1)}% of total`
+        }}
+      }}
   }, titleSt);
 }
 
@@ -1908,48 +1917,123 @@ function makeAgentChart(rows, sch, grid){
   const cnts = {};
   rows.forEach(r=>{ const v=cleanAgentName(String(r[sch.agentCol]||'').trim()); if(v) cnts[v]=(cnts[v]||0)+1; });
   if(!Object.keys(cnts).length) return;
-  const sorted = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).slice(0,12);
-  const labels = sorted.map(e=>e[0]);
-  const data   = sorted.map(e=>e[1]);
+  const sorted = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const fullLabels = sorted.map(e=>e[0]);
+  const dispLabels = fullLabels.map(l=>truncLabel(l,28));
+  const data       = sorted.map(e=>e[1]);
+  const total      = data.reduce((s,v)=>s+v,0);
 
   const id = 'chart_agent';
   const titleAg = `👤 ${sch.agentCol} Workload`;
-  const box = createChartBox(id, titleAg, false, true);
+  const dynH = Math.max(260, fullLabels.length * 36);
+  const box = createChartBox(id, titleAg, false, false);
+  box.querySelector('.chart-body').style.height = dynH+'px';
   grid.appendChild(box);
+  const dlColor = _lightMode ? '#475569' : '#94a3b8';
+  const gridColor = _lightMode ? 'rgba(203,213,225,.6)' : 'rgba(45,55,72,.5)';
   mkChart(id,{
+    plugins: typeof ChartDataLabels!=='undefined'?[ChartDataLabels]:[],
     type:'bar',
-    data:{labels,datasets:[{label:'Records',data,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderColor:labels.map((_,i)=>BORDERS[i%BORDERS.length]),borderWidth:2,borderRadius:5,borderSkipped:false}]},
+    data:{labels:dispLabels,datasets:[{label:'Records',data,
+      backgroundColor:fullLabels.map((_,i)=>PALETTE[i%PALETTE.length]),
+      borderColor:fullLabels.map((_,i)=>BORDERS[i%BORDERS.length]),
+      borderWidth:2,borderRadius:4,borderSkipped:false}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      onClick:(e,els)=>{ if(els.length) applyDrilldown(sch.agentCol, labels[els[0].index]); },
+      layout:{padding:{right:52}},
+      onClick:(e,els)=>{ if(els.length) applyDrilldown(sch.agentCol, fullLabels[els[0].index]); },
       onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x} records`}}},
-      scales:{x:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8'}}}}
+      plugins:{
+        legend:{display:false},
+        tooltip:{...TT,callbacks:{
+          title:(items)=>[fullLabels[items[0].dataIndex]],
+          label:(c)=>{ const pct=((c.parsed.x/total)*100).toFixed(1); return ` ${c.parsed.x.toLocaleString()} records · ${pct}% of total`; }
+        }},
+        datalabels:{display:true,color:dlColor,anchor:'end',align:'end',
+          font:{size:10,weight:'700'},formatter:v=>v.toLocaleString(),padding:{left:4},clip:false}
+      },
+      scales:{
+        x:{beginAtZero:true,grid:{color:gridColor},ticks:{precision:0,color:'#94a3b8',font:{size:11}}},
+        y:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:11},maxRotation:0},
+           afterFit:s=>{s.width=Math.max(s.width,155);}}
+      }
+    }
   }, titleAg);
 }
 
-function makeCatBarChart(col, rows, grid, horizontal){
+function makeCatBarChart(col, rows, grid, _hintHoriz){
   const cnts = {};
   const isAgent = col===schema.agentCol;
   rows.forEach(r=>{ let v=String(r[col]||'').trim(); if(isAgent) v=cleanAgentName(v); if(v) cnts[v]=(cnts[v]||0)+1; });
   if(!Object.keys(cnts).length) return;
-  const sorted = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).slice(0,horizontal?12:15);
-  const labels = sorted.map(e=>e[0]);
-  const data   = sorted.map(e=>e[1]);
+
+  // Always sort highest → lowest, cap at 15 items
+  const sorted = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const fullLabels = sorted.map(e=>e[0]);
+  const data       = sorted.map(e=>e[1]);
+  const total      = data.reduce((s,v)=>s+v,0);
+
+  // Auto-decide orientation: horizontal if hinted, >8 bars, or any label >20 chars
+  const maxLabelLen = Math.max(...fullLabels.map(l=>l.length));
+  const useHoriz = _hintHoriz || fullLabels.length > 8 || maxLabelLen > 20;
+
+  // Truncate display labels (28 chars for horizontal, 14 for vertical)
+  const truncLen   = useHoriz ? 28 : 14;
+  const dispLabels = fullLabels.map(l=>truncLabel(l, truncLen));
+
   const colInfo = schema.cols.find(c=>c.header===col);
   const icon = TYPE_ICONS[colInfo?.type]||'📊';
   const id = `chart_${sanitizeId(col)}`;
   const titleCat = `${icon} ${col}`;
-  const box = createChartBox(id, titleCat, false, horizontal&&labels.length>6);
+
+  // Dynamic height for horizontal: 36px per bar, minimum 260
+  const dynH = useHoriz ? Math.max(260, fullLabels.length * 36) : 260;
+  const box = createChartBox(id, titleCat, false, false);
+  box.querySelector('.chart-body').style.height = dynH+'px';
   grid.appendChild(box);
+
+  const dlColor   = _lightMode ? '#475569' : '#94a3b8';
+  const gridColor = _lightMode ? 'rgba(203,213,225,.6)' : 'rgba(45,55,72,.5)';
+
   mkChart(id,{
+    plugins: typeof ChartDataLabels!=='undefined'?[ChartDataLabels]:[],
     type:'bar',
-    data:{labels,datasets:[{label:'Records',data,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderColor:labels.map((_,i)=>BORDERS[i%BORDERS.length]),borderWidth:2,borderRadius:5,borderSkipped:false}]},
-    options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,
-      onClick:(e,els)=>{ if(els.length) applyDrilldown(col, labels[els[0].index]); },
+    data:{labels:dispLabels,datasets:[{label:'Records',data,
+      backgroundColor:fullLabels.map((_,i)=>PALETTE[i%PALETTE.length]),
+      borderColor:fullLabels.map((_,i)=>BORDERS[i%BORDERS.length]),
+      borderWidth:2,borderRadius:4,borderSkipped:false}]},
+    options:{
+      indexAxis: useHoriz?'y':'x',
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{ right: useHoriz?52:8, top: useHoriz?0:20 }},
+      onClick:(e,els)=>{ if(els.length) applyDrilldown(col, fullLabels[els[0].index]); },
       onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>{ const v=horizontal?c.parsed.x:c.parsed.y; const pct=((v/data.reduce((s,x)=>s+x,0))*100).toFixed(1); return ` ${v} records (${pct}%)`; }}}},
-      scales:{x:{beginAtZero:true,grid:{color:horizontal?'rgba(45,55,72,.5)':'none'},ticks:{precision:0,color:'#94a3b8',maxRotation:horizontal?0:30}},
-              y:{grid:{color:horizontal?'none':'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8'}}}}
+      plugins:{
+        legend:{display:false},
+        tooltip:{...TT,callbacks:{
+          title:(items)=>[fullLabels[items[0].dataIndex]],
+          label:(c)=>{
+            const val = useHoriz?c.parsed.x:c.parsed.y;
+            const pct = ((val/total)*100).toFixed(1);
+            return ` ${val.toLocaleString()} records · ${pct}% of total`;
+          }
+        }},
+        datalabels:{display:true,color:dlColor,anchor:'end',align:'end',
+          font:{size:10,weight:'700'},formatter:v=>v.toLocaleString(),padding:{left:4},clip:false}
+      },
+      scales:{
+        x:{beginAtZero:true,
+          grid:{color: useHoriz?gridColor:'rgba(0,0,0,0)'},
+          ticks:{precision:0,color:'#94a3b8',font:{size:11},
+            maxRotation: useHoriz?0:0,  // never rotate — if vertical falls here, labels are short
+            maxTicksLimit:20}
+        },
+        y:{
+          grid:{color: useHoriz?'rgba(0,0,0,0)':gridColor},
+          ticks:{color:'#94a3b8',font:{size:11},maxRotation:0},
+          ...(useHoriz?{afterFit:s=>{s.width=Math.max(s.width,160);}}:{})
+        }
+      }
+    }
   }, titleCat);
 }
 
@@ -1976,7 +2060,9 @@ function makeResolutionTrendChart(rows, sch, grid){
   mkChart(id,{
     type:'line',
     data:{labels,datasets:[{label:'Avg Hours',data,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.12)',tension:.35,fill:true,pointRadius:4,pointBackgroundColor:'#f59e0b',borderWidth:2}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y}h avg`}}},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},datalabels:{display:false},
+        tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y}h avg resolution time`}}},
       scales:{x:{grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8',maxRotation:30}},y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8'}}}}
   }, titleRT);
 }
