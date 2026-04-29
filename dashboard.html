@@ -305,9 +305,161 @@ tbody td{padding:10px 14px;white-space:nowrap;max-width:280px;overflow:hidden;te
   .kpi-value{font-size:1.6rem}
   .upload-title{font-size:1.5rem}
 }
+
+/* ── Light mode ── */
+body.light-mode{
+  --bg:#f8fafc;--surface:#ffffff;--surface2:#f1f5f9;--surface3:#e2e8f0;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#1e293b;--muted:#64748b;--muted2:#94a3b8;
+  --accent-dim:rgba(99,102,241,.1);
+}
+body.light-mode .filter-input[type="date"]{color-scheme:light}
+body.light-mode .filter-input[type="date"]::-webkit-calendar-picker-indicator{filter:none}
+body.light-mode .add-filter-panel{box-shadow:0 8px 28px rgba(0,0,0,.15)}
+body.light-mode select option{background:#f1f5f9;color:#1e293b}
+body,header,.kpi-card,.chart-box,.ai-card,.table-box,.banner,#filter-bar,#source-bar,#ai-key-bar,
+.preview-card,.shortcuts-card,.chart-fs-card,.agent-card,.filter-pill,
+.col-badge,.add-filter-panel,.afp-item,.toast,.report-modal-foot,.report-modal-hdr,
+#report-modal{transition:background-color .3s,border-color .3s,color .2s}
+
+/* ── Page progress bar ── */
+#page-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:10000;pointer-events:none;background:transparent}
+#page-progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--cyan));border-radius:0 2px 2px 0}
+
+/* ── Upload screen enhancements ── */
+@keyframes bounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-12px)}60%{transform:translateY(-7px)}}
+.dz-icon{display:block;font-size:3.2rem;margin-bottom:14px;animation:bounce 2.6s ease-in-out infinite}
+#drop-zone.over{border-color:var(--accent);box-shadow:0 0 0 5px rgba(99,102,241,.18),0 0 24px rgba(99,102,241,.25);background:rgba(99,102,241,.07);transform:scale(1.012)}
+.feature-chips{display:flex;gap:14px;justify-content:center;margin:28px 0 8px;flex-wrap:wrap}
+.feature-chip{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;min-width:130px;cursor:default;transition:all .2s}
+.feature-chip:hover{border-color:var(--accent);background:var(--accent-dim);transform:translateY(-2px)}
+.feature-chip-icon{font-size:1.7rem;line-height:1}
+.feature-chip-label{font-size:.82rem;font-weight:700;color:var(--text)}
+.feature-chip-sub{font-size:.71rem;color:var(--muted2);text-align:center}
+.try-demo-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:8px 20px;border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s}
+.try-demo-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.formats-badge{margin-top:14px;font-size:.74rem;color:var(--muted2);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 14px;display:inline-block}
+
+/* Upload progress steps */
+#upload-progress{display:none;margin-top:24px;padding:20px 24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:left}
+.upload-steps{display:flex;flex-direction:column;gap:12px}
+.upload-step-item{display:flex;align-items:center;gap:12px;font-size:.83rem;color:var(--muted2);transition:color .2s}
+.upload-step-item.active{color:var(--text);font-weight:600}
+.upload-step-item.done{color:var(--green)}
+.step-dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;transition:all .2s}
+.upload-step-item.active .step-dot{border-color:var(--accent);background:var(--accent-dim);animation:spin .9s linear infinite}
+.upload-step-item.done .step-dot{border-color:var(--green);background:rgba(16,185,129,.1);color:var(--green);animation:none}
+.upload-step-item.done .step-dot::after{content:'✓';font-size:.7rem;font-weight:700}
+
+/* ── Skeleton loading ── */
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--radius-sm)}
+.skeleton-kpi{height:88px;border-radius:var(--radius)}
+.skeleton-chart{height:300px;border-radius:var(--radius)}
+
+/* ── KPI tooltip / health ── */
+.kpi-info-btn{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted2);cursor:pointer;font-size:.82rem;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .15s;line-height:1;z-index:2;flex-shrink:0}
+.kpi-info-btn:hover{background:rgba(148,163,184,.15);color:var(--text)}
+.kpi-tip{position:absolute;bottom:calc(100% + 10px);right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;font-size:.76rem;color:var(--muted);line-height:1.6;width:220px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.4);text-align:left;display:none;pointer-events:none}
+.kpi-tip strong{color:var(--text)}
+.kpi-info-btn:hover~.kpi-tip,.kpi-tip.visible{display:block}
+.kpi-health{position:absolute;bottom:14px;right:16px;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;line-height:1.5}
+.kpi-health.good{background:rgba(16,185,129,.12);color:var(--green)}
+.kpi-health.warn{background:rgba(245,158,11,.12);color:var(--yellow)}
+.kpi-health.crit{background:rgba(239,68,68,.12);color:var(--red)}
+
+/* ── Drill-down breadcrumb ── */
+#drilldown-bar{background:var(--accent-dim);border-bottom:1px solid rgba(99,102,241,.25);padding:9px 28px;display:none;align-items:center;gap:12px;flex-wrap:wrap;font-size:.83rem}
+#drilldown-bar.on{display:flex}
+.drilldown-crumb{color:var(--accent);font-weight:600;flex:1}
+.drilldown-back{background:none;border:1px solid rgba(99,102,241,.4);color:var(--accent);border-radius:20px;padding:5px 14px;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.drilldown-back:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ── Chart expand button ── */
+.chart-expand-btn{background:none;border:1px solid var(--border);color:var(--muted2);border-radius:6px;padding:3px 7px;font-size:.75rem;cursor:pointer;transition:all .15s;flex-shrink:0}
+.chart-expand-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border2)}
+.chart-body{cursor:crosshair}
+
+/* ── Fullscreen chart modal ── */
+#chart-fullscreen{position:fixed;inset:0;background:rgba(10,14,26,.94);display:none;place-items:center;z-index:9100;padding:24px;backdrop-filter:blur(8px)}
+#chart-fullscreen.on{display:grid}
+.chart-fs-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:1040px;padding:24px;position:relative;display:flex;flex-direction:column;max-height:90vh}
+.chart-fs-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px}
+.chart-fs-title{font-size:1rem;font-weight:700}
+.chart-fs-hint{font-size:.72rem;color:var(--muted2)}
+.chart-fs-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.4rem;padding:4px 8px;border-radius:6px;line-height:1;transition:all .15s}
+.chart-fs-close:hover{background:var(--surface2);color:var(--text)}
+.chart-fs-body{flex:1;position:relative;min-height:420px;display:flex;align-items:center;justify-content:center}
+.chart-fs-body img{max-width:100%;max-height:100%;object-fit:contain}
+
+/* ── Keyboard shortcuts modal ── */
+#shortcuts-modal{position:fixed;inset:0;background:rgba(10,14,26,.88);display:none;place-items:center;z-index:9200;padding:20px;backdrop-filter:blur(5px)}
+#shortcuts-modal.on{display:grid}
+.shortcuts-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:420px;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.shortcuts-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.shortcuts-head h2{font-size:.95rem;font-weight:700}
+.shortcuts-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.3rem;padding:4px 8px;border-radius:6px;line-height:1}
+.shortcuts-close:hover{background:var(--surface2);color:var(--text)}
+.shortcuts-body{padding:14px 24px 20px}
+.shortcut-row{display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid var(--border)}
+.shortcut-row:last-child{border-bottom:none}
+kbd{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:.78rem;font-family:monospace;font-weight:700;color:var(--text);min-width:36px;text-align:center;flex-shrink:0}
+.shortcut-desc{font-size:.83rem;color:var(--muted)}
+.shortcuts-hint-bar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-size:.7rem;color:var(--muted2);pointer-events:none;display:none;align-items:center;gap:5px;background:rgba(10,14,26,.7);padding:5px 14px;border-radius:20px;backdrop-filter:blur(4px)}
+@media(min-width:769px){.shortcuts-hint-bar{display:flex}}
+
+/* ── Header enhancements ── */
+.btn-icon{padding:8px 10px;font-size:1rem}
+#hamburger-btn{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2)}
+#hamburger-btn span{display:block;width:18px;height:2px;background:var(--text);border-radius:1px;transition:all .2s}
+.hdr-mobile-menu{position:absolute;top:calc(100% + 4px);right:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;display:none;flex-direction:column;gap:4px;min-width:180px;z-index:300;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.hdr-mobile-menu.open{display:flex}
+.hdr-mobile-menu .btn{width:100%;justify-content:flex-start}
+@media(max-width:640px){
+  #hamburger-btn{display:flex}
+  .hdr-main-actions{display:none}
+  header{position:relative}
+  .hdr-actions{gap:6px}
+}
+
+/* ── Mobile improvements ── */
+@media(max-width:768px){
+  .btn{min-height:44px}
+  .btn-sm{min-height:36px}
+  .filter-input,.filter-select{min-height:44px;height:44px}
+  .kpi-card{padding:16px 18px}
+  #filter-bar{padding:12px 16px}
+  #drilldown-bar{padding:9px 16px}
+  #ai-key-bar{padding:10px 16px}
+}
+@media(max-width:480px){
+  .feature-chips{gap:8px}
+  .feature-chip{min-width:100px;padding:14px 12px}
+}
+/* Sticky first column in table on mobile */
+@media(max-width:768px){
+  .tbl-scroll{-webkit-overflow-scrolling:touch}
+  table{min-width:500px}
+  thead th:first-child,tbody td:first-child{position:sticky;left:0;background:var(--surface);z-index:1}
+}
+
+/* ── Fade-in animation for KPIs/Charts on load ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kpi-card{animation:fadeUp .35s ease both}
+.kpi-card:nth-child(1){animation-delay:.04s}
+.kpi-card:nth-child(2){animation-delay:.08s}
+.kpi-card:nth-child(3){animation-delay:.12s}
+.kpi-card:nth-child(4){animation-delay:.16s}
+.chart-box{animation:fadeUp .4s ease both}
+
+/* ── Share button toast style ── */
+.toast-share{border-color:var(--cyan);color:var(--cyan)}
 </style>
 </head>
 <body>
+
+<!-- Page progress bar -->
+<div id="page-progress"><div id="page-progress-fill"></div></div>
 
 <!-- Spinner -->
 <div id="spinner"><div class="spin-ring"></div><p id="spin-msg">Processing…</p></div>
@@ -316,33 +468,44 @@ tbody td{padding:10px 14px;white-space:nowrap;max-width:280px;overflow:hidden;te
 <div id="upload-screen">
   <div class="upload-hero">
     <div class="upload-logo">📊</div>
-    <h1 class="upload-title">Universal Data Dashboard</h1>
-    <p class="upload-sub">Drop any CSV or Excel file. We'll figure out the rest.</p>
+    <h1 class="upload-title">Turn your data into insights instantly</h1>
+    <p class="upload-sub">Upload any CSV or Excel file — no setup needed</p>
     <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
     <div id="drop-zone">
       <span class="dz-icon">📂</span>
       <h3>Drag &amp; drop your file here</h3>
       <p>or <span class="click-link" id="browse-link">click to browse</span></p>
-      <p class="drop-hint">Supports .csv · .xlsx · .xls &nbsp;·&nbsp; Any column names &nbsp;·&nbsp; Auto-detects everything</p>
+      <p class="drop-hint">Auto-detects dates · status · agents · categories · numbers</p>
       <div class="drop-actions">
         <button class="btn btn-primary" id="dl-sample-btn">⬇ Download Sample CSV</button>
+        <button class="try-demo-btn" id="try-demo-btn">▶ Try with Sample Data</button>
       </div>
     </div>
-    <div class="col-types-row">
-      <div class="col-type-chip">📅 Dates</div>
-      <div class="col-type-chip">🔵 Status</div>
-      <div class="col-type-chip">👤 Agents / Names</div>
-      <div class="col-type-chip">⚡ Priority</div>
-      <div class="col-type-chip">📊 Categories</div>
-      <div class="col-type-chip">🔢 Numbers</div>
+    <div id="upload-progress">
+      <div class="upload-steps">
+        <div class="upload-step-item" id="ustep-0"><div class="step-dot"></div><span>Reading file</span></div>
+        <div class="upload-step-item" id="ustep-1"><div class="step-dot"></div><span>Detecting columns &amp; types</span></div>
+        <div class="upload-step-item" id="ustep-2"><div class="step-dot"></div><span>Building dashboard</span></div>
+      </div>
     </div>
-    <div class="works-with">Works with any kind of data:</div>
-    <div class="works-tags">
-      <div class="works-tag">🎫 IT Support Tickets</div>
-      <div class="works-tag">👥 HR Records</div>
-      <div class="works-tag">💰 Sales Data</div>
-      <div class="works-tag">📋 Any CSV file</div>
+    <div class="feature-chips">
+      <div class="feature-chip">
+        <div class="feature-chip-icon">🤖</div>
+        <div class="feature-chip-label">AI-Powered Insights</div>
+        <div class="feature-chip-sub">Summaries, anomalies &amp; predictions</div>
+      </div>
+      <div class="feature-chip">
+        <div class="feature-chip-icon">📊</div>
+        <div class="feature-chip-label">Auto-Generated Charts</div>
+        <div class="feature-chip-sub">Charts built from your columns</div>
+      </div>
+      <div class="feature-chip">
+        <div class="feature-chip-icon">🔍</div>
+        <div class="feature-chip-label">Smart Filters</div>
+        <div class="feature-chip-sub">Filter &amp; drill down instantly</div>
+      </div>
     </div>
+    <div class="formats-badge">CSV · XLSX · XLS</div>
   </div>
 </div>
 
@@ -374,8 +537,21 @@ tbody td{padding:10px 14px;white-space:nowrap;max-width:280px;overflow:hidden;te
       <p id="hdr-sub">Upload any CSV or Excel file to begin</p>
     </div>
     <div class="hdr-actions">
-      <button class="btn btn-primary" id="btn-upload-hdr"><span>⬆</span><span>Upload File</span></button>
-      <button class="btn" id="btn-pdf" disabled><span>⬇</span><span>Export PDF</span></button>
+      <div class="hdr-main-actions" style="display:flex;gap:10px;align-items:center">
+        <button class="btn btn-primary" id="btn-upload-hdr"><span>⬆</span><span>Upload File</span></button>
+        <button class="btn" id="btn-pdf" disabled><span>⬇</span><span>Export PDF</span></button>
+        <button class="btn btn-icon" id="btn-share" title="Share dashboard link" style="display:none">🔗</button>
+      </div>
+      <button class="btn btn-icon" id="theme-toggle" title="Toggle light/dark mode">🌙</button>
+      <button id="hamburger-btn" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="hdr-mobile-menu" id="hdr-mobile-menu">
+        <button class="btn btn-primary" id="btn-upload-mob">⬆ Upload File</button>
+        <button class="btn" id="btn-pdf-mob" disabled>⬇ Export PDF</button>
+        <button class="btn" id="btn-share-mob" style="display:none">🔗 Share</button>
+        <button class="btn" id="btn-shortcuts-mob">⌨ Shortcuts</button>
+      </div>
     </div>
   </header>
 
@@ -385,6 +561,11 @@ tbody td{padding:10px 14px;white-space:nowrap;max-width:280px;overflow:hidden;te
       <button class="btn-sm" id="btn-view-cols">🔍 Column Types</button>
       <button class="btn-sm" id="btn-change-file">📂 Change File</button>
     </div>
+  </div>
+
+  <div id="drilldown-bar">
+    <span class="drilldown-crumb" id="drilldown-crumb">All Data</span>
+    <button class="drilldown-back" id="drilldown-back">← Back to All</button>
   </div>
 
   <div id="filter-bar">
@@ -497,6 +678,40 @@ tbody td{padding:10px 14px;white-space:nowrap;max-width:280px;overflow:hidden;te
   </div>
 </div>
 
+<!-- Fullscreen Chart Modal -->
+<div id="chart-fullscreen">
+  <div class="chart-fs-card">
+    <div class="chart-fs-head">
+      <span class="chart-fs-title" id="chart-fs-title">Chart</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="chart-fs-hint">Double-click chart to expand · Click bars to filter</span>
+        <button class="chart-fs-close" id="chart-fs-close">✕</button>
+      </div>
+    </div>
+    <div class="chart-fs-body" id="chart-fs-body"></div>
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts Modal -->
+<div id="shortcuts-modal">
+  <div class="shortcuts-card">
+    <div class="shortcuts-head">
+      <h2>⌨ Keyboard Shortcuts</h2>
+      <button class="shortcuts-close" id="shortcuts-close">✕</button>
+    </div>
+    <div class="shortcuts-body">
+      <div class="shortcut-row"><kbd>U</kbd><span class="shortcut-desc">Open upload dialog</span></div>
+      <div class="shortcut-row"><kbd>R</kbd><span class="shortcut-desc">Reset all filters</span></div>
+      <div class="shortcut-row"><kbd>E</kbd><span class="shortcut-desc">Export PDF</span></div>
+      <div class="shortcut-row"><kbd>?</kbd><span class="shortcut-desc">Show this help</span></div>
+      <div class="shortcut-row"><kbd>Esc</kbd><span class="shortcut-desc">Close any open modal or dropdown</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Shortcuts hint bar (desktop only) -->
+<div class="shortcuts-hint-bar">⌨ Press <kbd style="font-size:.65rem;padding:2px 6px">?</kbd> for shortcuts</div>
+
 <div id="toasts"></div>
 
 <script>
@@ -530,17 +745,30 @@ let apiKey = '';
 let currentFilename = '';
 let _aiStats = null;
 const charts = {};
+const chartMeta = {}; // id → {title} for fullscreen
 let addedFilterCols = new Set();
 let filterPresets = [];
 let _pillClearFns = [];
+let drilldownFilter = null;
+let _lightMode = sessionStorage.getItem('dash-theme') === 'light';
+let _fullscreenChart = null;
 
 // ─────────────────────────────────────────────────────────
 // CHART DEFAULTS
 // ─────────────────────────────────────────────────────────
-Chart.defaults.color = '#94a3b8';
-Chart.defaults.borderColor = '#2d3748';
 Chart.defaults.font.family = "'Segoe UI',system-ui,sans-serif";
-const TT = { backgroundColor:'#1f2937', borderColor:'#374151', borderWidth:1, titleColor:'#f1f5f9', bodyColor:'#94a3b8', padding:12, cornerRadius:8 };
+const TT = {};
+function updateChartDefaults(){
+  const light = _lightMode;
+  Chart.defaults.color = light ? '#64748b' : '#94a3b8';
+  Chart.defaults.borderColor = light ? '#e2e8f0' : '#2d3748';
+  TT.backgroundColor = light ? '#ffffff' : '#1f2937';
+  TT.borderColor     = light ? '#e2e8f0' : '#374151';
+  TT.borderWidth=1; TT.padding=12; TT.cornerRadius=8;
+  TT.titleColor = light ? '#1e293b' : '#f1f5f9';
+  TT.bodyColor  = light ? '#64748b' : '#94a3b8';
+}
+updateChartDefaults();
 
 // ─────────────────────────────────────────────────────────
 // UTILITIES
@@ -614,6 +842,128 @@ function toast(msg,type='info'){
 
 function showSpinner(msg='Processing…'){ document.getElementById('spin-msg').textContent=msg; document.getElementById('spinner').classList.add('on'); }
 function hideSpinner(){ document.getElementById('spinner').classList.remove('on'); }
+
+// ── Theme ──────────────────────────────────────────────────
+function applyTheme(rebuild=false){
+  document.body.classList.toggle('light-mode', _lightMode);
+  document.getElementById('theme-toggle').textContent = _lightMode ? '☀️' : '🌙';
+  updateChartDefaults();
+  if(rebuild && rawRows.length && schema) buildCharts(filteredRows.length ? filteredRows : rawRows, schema);
+}
+function toggleTheme(){
+  _lightMode = !_lightMode;
+  sessionStorage.setItem('dash-theme', _lightMode ? 'light' : 'dark');
+  applyTheme(true);
+}
+
+// ── Page progress bar ──────────────────────────────────────
+function startProgress(){
+  const fill = document.getElementById('page-progress-fill');
+  fill.style.transition='none'; fill.style.width='0';
+  requestAnimationFrame(()=>{ fill.style.transition='width 2.5s ease-out'; fill.style.width='80%'; });
+}
+function finishProgress(){
+  const fill = document.getElementById('page-progress-fill');
+  fill.style.transition='width .3s ease'; fill.style.width='100%';
+  setTimeout(()=>{ fill.style.transition='none'; fill.style.width='0'; },420);
+}
+
+// ── Upload progress steps ──────────────────────────────────
+function showUploadStep(idx){
+  document.getElementById('upload-progress').style.display='';
+  ['ustep-0','ustep-1','ustep-2'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.classList.remove('active','done');
+    if(i<idx) el.classList.add('done');
+    else if(i===idx) el.classList.add('active');
+  });
+}
+function hideUploadProgress(){ document.getElementById('upload-progress').style.display='none'; }
+
+// ── Count-up animation ─────────────────────────────────────
+function animateCountUp(el, from, to, dur, pre='', suf='', dec=false){
+  const start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    const val=from+(to-from)*ease;
+    const fmt=dec?val.toFixed(1):Math.round(val).toLocaleString();
+    el.textContent=pre+fmt+suf;
+    if(p<1) requestAnimationFrame(step);
+    else el.textContent=pre+(dec?to.toFixed(1):to.toLocaleString())+suf;
+  }
+  requestAnimationFrame(step);
+}
+
+// ── Skeleton loading ───────────────────────────────────────
+function showSkeletons(){
+  document.getElementById('kpi-container').innerHTML=
+    [0,1,2,3].map(()=>`<div class="skeleton skeleton-kpi"></div>`).join('');
+  const c=document.getElementById('charts-container');
+  c.innerHTML='<div class="charts-grid">'+
+    [0,1,2,3].map(()=>`<div class="skeleton skeleton-chart"></div>`).join('')+
+    '</div>';
+}
+
+// ── Drill-down ─────────────────────────────────────────────
+function applyDrilldown(col, value){
+  drilldownFilter={col,value};
+  const isAgent=schema?.agentCol===col;
+  const filtered=rawRows.filter(r=>{ let v=String(r[col]||'').trim(); if(isAgent)v=cleanAgentName(v); return v===value; });
+  filteredRows=filtered;
+  renderAll(filtered);
+  updateFilterPills(); updateFilterBadge();
+  document.getElementById('drilldown-bar').classList.add('on');
+  document.getElementById('drilldown-crumb').textContent=
+    `All Data › ${col}: "${value}" — ${filtered.length.toLocaleString()} record${filtered.length!==1?'s':''}`;
+  toast(`Filtered: ${value} (${filtered.length.toLocaleString()} records)`,'info');
+}
+function clearDrilldown(){
+  drilldownFilter=null;
+  document.getElementById('drilldown-bar').classList.remove('on');
+  filteredRows=[...rawRows];
+  renderAll(filteredRows); updateFilterPills(); updateFilterBadge();
+}
+
+// ── Fullscreen chart ───────────────────────────────────────
+function openFullscreenChart(id){
+  const chart=charts[id];
+  const meta=chartMeta[id];
+  if(!chart) return;
+  document.getElementById('chart-fs-title').textContent=meta?.title||'Chart';
+  document.getElementById('chart-fullscreen').classList.add('on');
+  // Render as high-res image (avoids Chart.js config-clone issues)
+  const imgSrc=chart.toBase64Image('image/png',1);
+  document.getElementById('chart-fs-body').innerHTML=
+    `<img src="${imgSrc}" alt="${meta?.title||'Chart'}" style="max-width:100%;max-height:600px;object-fit:contain">`;
+}
+function closeFullscreenChart(){
+  document.getElementById('chart-fullscreen').classList.remove('on');
+  document.getElementById('chart-fs-body').innerHTML='';
+}
+
+// ── Share ──────────────────────────────────────────────────
+function shareCurrentView(){
+  const url=window.location.href.split('?')[0].split('#')[0];
+  navigator.clipboard?.writeText(url).then(
+    ()=>toast('Link copied! (Open the URL and re-upload your file to share)','info'),
+    ()=>toast('Copy failed — copy the URL from your browser bar','error')
+  );
+}
+
+// ── Try with sample data ───────────────────────────────────
+function tryWithSampleData(){
+  const csv=getSampleCSV();
+  showUploadStep(0);
+  setTimeout(()=>{
+    showUploadStep(1);
+    const result=Papa.parse(csv.trim(),{header:true,skipEmptyLines:true,dynamicTyping:false});
+    setTimeout(()=>{
+      showUploadStep(2);
+      processAndLoad(result.meta.fields||[],result.data,'sample-data.csv');
+    },280);
+  },200);
+}
 
 // ─────────────────────────────────────────────────────────
 // COLUMN DETECTION
@@ -798,44 +1148,46 @@ function processAndLoad(headers, rows, filename){
 }
 
 function parseCSVFile(file){
-  showSpinner('Parsing CSV…');
   const reader = new FileReader();
   reader.onload = e => {
-    hideSpinner();
+    showUploadStep(1);
     const result = Papa.parse(e.target.result,{header:true,skipEmptyLines:true,dynamicTyping:false});
-    if(!result.data.length){ toast('CSV appears to be empty','error'); return; }
+    if(!result.data.length){ hideUploadProgress(); toast('CSV appears to be empty','error'); return; }
+    showUploadStep(2);
     processAndLoad(result.meta.fields||[], result.data, file.name);
   };
-  reader.onerror=()=>{ hideSpinner(); toast('Could not read file','error'); };
+  reader.onerror=()=>{ hideUploadProgress(); toast('Could not read file','error'); };
   reader.readAsText(file);
 }
 
 function parseExcelFile(file){
-  showSpinner('Parsing Excel…');
   const reader = new FileReader();
   reader.onload = e => {
-    hideSpinner();
+    showUploadStep(1);
     try{
       const wb = XLSX.read(e.target.result,{type:'array',raw:false});
-      if(!wb.SheetNames.length){ toast('No sheets found','error'); return; }
+      if(!wb.SheetNames.length){ hideUploadProgress(); toast('No sheets found','error'); return; }
       const ws = wb.Sheets[wb.SheetNames[0]];
       const rawData = XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
-      if(!rawData.length){ toast('Sheet appears empty','error'); return; }
+      if(!rawData.length){ hideUploadProgress(); toast('Sheet appears empty','error'); return; }
       const hdrs = Object.keys(rawData[0]);
       const rows = rawData.map(row=>{ const o={}; hdrs.forEach(h=>{ o[h]=row[h]!==undefined?String(row[h]):''; }); return o; });
+      showUploadStep(2);
       processAndLoad(hdrs, rows, file.name);
-    }catch(err){ toast('Could not read Excel: '+err.message,'error'); }
+    }catch(err){ hideUploadProgress(); toast('Could not read Excel: '+err.message,'error'); }
   };
-  reader.onerror=()=>{ hideSpinner(); toast('Could not read file','error'); };
+  reader.onerror=()=>{ hideUploadProgress(); toast('Could not read file','error'); };
   reader.readAsArrayBuffer(file);
 }
 
 function handleFile(file){
   if(!file) return;
   const n = file.name.toLowerCase();
+  showUploadStep(0);
+  startProgress();
   if(n.endsWith('.csv')) parseCSVFile(file);
   else if(n.endsWith('.xlsx')||n.endsWith('.xls')) parseExcelFile(file);
-  else toast('Please select a .csv, .xlsx, or .xls file','error');
+  else { hideUploadProgress(); toast('Please select a .csv, .xlsx, or .xls file','error'); }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -895,12 +1247,35 @@ function buildDashboard(rows, sch, filename){
   document.getElementById('src-name').textContent = filename;
   document.getElementById('src-rows').textContent = rows.length.toLocaleString();
   document.getElementById('btn-pdf').disabled = false;
+  document.getElementById('btn-pdf-mob').disabled = false;
+  document.getElementById('btn-share').style.display = '';
+  document.getElementById('btn-share-mob').style.display = '';
   document.getElementById('hdr-sub').textContent = `${rows.length.toLocaleString()} records · ${rawHeaders.length} columns`;
+
+  // Show skeleton placeholders immediately
+  document.getElementById('dashboard-content').style.display = '';
+  document.getElementById('empty-state').style.display = 'none';
+  showSkeletons();
 
   buildFilters(sch);
   filteredRows = rows;
-  renderAll(rows);
-  setupAISection(rows);
+
+  // Collapse filters on mobile by default
+  if(window.innerWidth <= 768){
+    const body=document.getElementById('filter-body');
+    const arrow=document.getElementById('filter-arrow');
+    body.classList.add('closed');
+    arrow.classList.add('closed');
+  }
+
+  // Small delay so skeleton renders before heavy chart work
+  requestAnimationFrame(()=>{
+    renderAll(rows);
+    setupAISection(rows);
+    hideUploadProgress();
+    finishProgress();
+    toast(`Dashboard loaded — ${rows.length.toLocaleString()} records`,'success');
+  });
   window.scrollTo({top:0});
 }
 
@@ -929,7 +1304,7 @@ function buildKPIs(rows, sch){
   const n = rows.length;
 
   // 1. Total records
-  kpis.push({label:'Total Records', value:n.toLocaleString(), color:'blue', icon:'📄', sub:currentFilename});
+  kpis.push({label:'Total Records', value:n.toLocaleString(), rawNum:n, color:'blue', icon:'📄', sub:currentFilename});
 
   // 2. Status-based: open + resolution rate
   if(sch.statusCol){
@@ -937,12 +1312,18 @@ function buildKPIs(rows, sch){
     rows.forEach(r=>{ const s=String(r[sch.statusCol]||'').trim(); if(s) cnts[s]=(cnts[s]||0)+1; });
     const openKeys  = Object.keys(cnts).filter(k=>/open|active|new|pend|wip|in.prog|waiting|progress/i.test(k));
     const openCount = openKeys.reduce((s,k)=>s+cnts[k],0);
-    if(openCount>0) kpis.push({label:'Open / Active', value:openCount.toLocaleString(), color:'red', icon:'🔴', sub:sch.statusCol});
+    if(openCount>0) kpis.push({label:'Open / Active', value:openCount.toLocaleString(), rawNum:openCount, color:'red', icon:'🔴', sub:sch.statusCol});
     const closedKeys  = Object.keys(cnts).filter(k=>/resolv|clos|done|complet|finish/i.test(k));
     const closedCount = closedKeys.reduce((s,k)=>s+cnts[k],0);
     if(closedCount>0){
-      const rate = ((closedCount/n)*100).toFixed(1);
-      kpis.push({label:'Resolution Rate', value:`${rate}%`, color:'green', icon:'✅', sub:`${closedCount.toLocaleString()} resolved`});
+      const rateNum = (closedCount/n)*100;
+      const rate = rateNum.toFixed(1);
+      const healthCls = rateNum>=85?'good':rateNum>=70?'warn':'crit';
+      const healthLabel = rateNum>=85?'● Good':rateNum>=70?'● Needs attention':'● Critical';
+      kpis.push({label:'Resolution Rate', value:`${rate}%`, rawNum:rateNum, suf:'%', dec:true,
+        color: rateNum>=85?'green':rateNum>=70?'yellow':'red',
+        icon:'✅', sub:`${closedCount.toLocaleString()} resolved`,
+        health:{cls:healthCls,label:healthLabel}});
     }
   }
 
@@ -955,8 +1336,9 @@ function buildKPIs(rows, sch){
     }).filter(t=>t!==null);
     if(times.length){
       const avg = times.reduce((s,v)=>s+v,0)/times.length;
-      const display = avg>=24 ? `${(avg/24).toFixed(1)}d` : `${avg.toFixed(1)}h`;
-      kpis.push({label:'Avg Resolution', value:display, color:'yellow', icon:'⏱', sub:`from ${times.length.toLocaleString()} records`});
+      const isD=avg>=24;
+      const display = isD ? `${(avg/24).toFixed(1)}d` : `${avg.toFixed(1)}h`;
+      kpis.push({label:'Avg Resolution', value:display, rawNum:isD?avg/24:avg, suf:isD?'d':'h', dec:true, color:'yellow', icon:'⏱', sub:`from ${times.length.toLocaleString()} records`});
     }
   }
 
@@ -977,13 +1359,47 @@ function buildKPIs(rows, sch){
   }
 
   const COLORS = ['blue','red','yellow','green','cyan','orange'];
-  document.getElementById('kpi-container').innerHTML = kpis.slice(0,4).map((k,i)=>`
-    <div class="kpi-card kpi-${k.color||COLORS[i]}">
+  const KPI_TIPS = {
+    'Total Records': 'The total number of rows in your uploaded file.',
+    'Tickets Still Open': 'Records currently open or active — not yet resolved or closed.',
+    'Open / Active': 'Records currently open or active — not yet resolved or closed.',
+    '% Issues Solved': 'Percentage resolved or closed. <strong>Higher is better.</strong> Industry average: 85%+.',
+    'Resolution Rate': 'Percentage resolved or closed. <strong>Higher is better.</strong> Industry average: 85%+.',
+    'Average Time to Fix': 'Average time from open date to close date across all resolved records.',
+    'Avg Resolution': 'Average time from open date to close date across all resolved records.',
+  };
+  document.getElementById('kpi-container').innerHTML = kpis.slice(0,4).map((k,i)=>{
+    const tip = KPI_TIPS[k.label] || (k.sub ? `Source column: <strong>${k.sub}</strong>` : '');
+    const tipHtml = tip ? `<button class="kpi-info-btn" tabindex="-1">ℹ</button><div class="kpi-tip">${tip}</div>` : '';
+    const healthHtml = k.health ? `<div class="kpi-health ${k.health.cls}">${k.health.label}</div>` : '';
+    return `<div class="kpi-card kpi-${k.color||COLORS[i]}">
       <div class="kpi-label">${k.label}</div>
-      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-value" data-num="${k.rawNum??''}" data-pre="${k.pre||''}" data-suf="${k.suf||''}" data-dec="${k.dec||''}">
+        ${k.value}
+      </div>
       <div class="kpi-sub">${k.sub||''}</div>
       <div class="kpi-icon">${k.icon}</div>
-    </div>`).join('');
+      ${tipHtml}
+      ${healthHtml}
+    </div>`;
+  }).join('');
+
+  // Count-up animation
+  document.querySelectorAll('.kpi-value[data-num]').forEach(el=>{
+    const raw=el.dataset.num;
+    if(raw==='') return;
+    const target=parseFloat(raw);
+    if(isNaN(target)) return;
+    animateCountUp(el,0,target,750,el.dataset.pre||'',el.dataset.suf||'',el.dataset.dec==='true');
+  });
+
+  // Tooltip hover
+  document.querySelectorAll('.kpi-info-btn').forEach(btn=>{
+    btn.addEventListener('mouseenter',()=>btn.nextElementSibling?.classList.add('visible'));
+    btn.addEventListener('mouseleave',()=>btn.nextElementSibling?.classList.remove('visible'));
+    btn.addEventListener('focus',()=>btn.nextElementSibling?.classList.add('visible'));
+    btn.addEventListener('blur',()=>btn.nextElementSibling?.classList.remove('visible'));
+  });
 }
 
 // ─────────────────────────────────────────────────────────
@@ -1182,6 +1598,9 @@ function applyFilters(){
   renderAll(filteredRows);
   updateFilterPills();
   updateFilterBadge();
+  const active = document.getElementById('filter-badge').style.display!=='none';
+  if(active && result.length===0) toast('No records match your filters','error');
+  else if(active) toast(`Filters applied — showing ${result.length.toLocaleString()} records`,'info');
 }
 
 function resetFilters(silent=false){
@@ -1395,20 +1814,27 @@ function renderPresets(){
 function createChartBox(id, title, full=false, tall=false){
   const box = document.createElement('div');
   box.className = `chart-box${full?' chart-full':''}`;
-  box.innerHTML = `<div class="chart-hdr"><h3>${title}</h3></div><div class="chart-body${tall?' tall':''}"><canvas id="${id}"></canvas></div>`;
+  box.innerHTML = `
+    <div class="chart-hdr">
+      <h3>${title}</h3>
+      <button class="chart-expand-btn" data-expand="${id}" title="Expand to fullscreen (or double-click chart)">⤢</button>
+    </div>
+    <div class="chart-body${tall?' tall':''}" data-expand="${id}"><canvas id="${id}"></canvas></div>`;
   return box;
 }
 
 function destroyAllCharts(){
   Object.values(charts).forEach(c=>{ try{c.destroy();}catch(_){} });
   for(const k in charts) delete charts[k];
+  for(const k in chartMeta) delete chartMeta[k];
 }
 
-function mkChart(id, config){
+function mkChart(id, config, title=''){
   if(charts[id]) charts[id].destroy();
   const el = document.getElementById(id);
   if(!el) return;
   charts[id] = new Chart(el, config);
+  chartMeta[id] = {title};
 }
 
 // ─────────────────────────────────────────────────────────
@@ -1438,14 +1864,17 @@ function makeTimeSeriesChart(rows, sch, grid){
   const data = keys.map(k=>cnts[k]);
 
   const id = 'chart_timeseries';
-  const box = createChartBox(id, `📈 Volume Over Time (${sch.primaryDate})`, true, true);
+  const title = `📈 Volume Over Time (${sch.primaryDate})`;
+  const box = createChartBox(id, title, true, true);
   grid.appendChild(box);
   mkChart(id,{
     type:'line',
     data:{labels,datasets:[{label:'Records',data,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,.12)',tension:.35,fill:true,pointRadius:data.length<=30?4:2,pointBackgroundColor:'#6366f1',borderWidth:2}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} records`}}},
+    options:{responsive:true,maintainAspectRatio:false,
+      onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} records`}}},
       scales:{x:{grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8',maxRotation:30,maxTicksLimit:14}},y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}}}}
-  });
+  }, title);
 }
 
 function makeStatusChart(rows, sch, grid){
@@ -1460,13 +1889,18 @@ function makeStatusChart(rows, sch, grid){
   const brd = labels.map((l,i)=>{ const v=l.toLowerCase(); return /open|active|new/.test(v)?'#ef4444':/resolv|clos|done|complet/.test(v)?'#10b981':/pend|wait|hold|wip|progress/.test(v)?'#f59e0b':BORDERS[i%BORDERS.length]; });
 
   const id = 'chart_status';
-  const box = createChartBox(id, `🥧 ${sch.statusCol} Distribution`);
+  const titleSt = `🥧 ${sch.statusCol} Distribution`;
+  const box = createChartBox(id, titleSt);
   grid.appendChild(box);
   mkChart(id,{
     type:'doughnut',
     data:{labels,datasets:[{data,backgroundColor:bgs,borderColor:brd,borderWidth:2,hoverOffset:8}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{padding:14,color:'#94a3b8',usePointStyle:true,pointStyle:'circle'}},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed} (${((c.parsed/total)*100).toFixed(1)}%)`}}}}
-  });
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      onClick:(e,els)=>{ if(els.length) applyDrilldown(sch.statusCol, labels[els[0].index]); },
+      onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
+      plugins:{legend:{position:'bottom',labels:{padding:14,color:'#94a3b8',usePointStyle:true,pointStyle:'circle'}},
+        tooltip:{...TT,callbacks:{label:c=>` ${c.parsed} (${((c.parsed/total)*100).toFixed(1)}%)`}}}}
+  }, titleSt);
 }
 
 function makeAgentChart(rows, sch, grid){
@@ -1479,14 +1913,18 @@ function makeAgentChart(rows, sch, grid){
   const data   = sorted.map(e=>e[1]);
 
   const id = 'chart_agent';
-  const box = createChartBox(id, `👤 ${sch.agentCol} Workload`, false, true);
+  const titleAg = `👤 ${sch.agentCol} Workload`;
+  const box = createChartBox(id, titleAg, false, true);
   grid.appendChild(box);
   mkChart(id,{
     type:'bar',
     data:{labels,datasets:[{label:'Records',data,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderColor:labels.map((_,i)=>BORDERS[i%BORDERS.length]),borderWidth:2,borderRadius:5,borderSkipped:false}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x} records`}}},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      onClick:(e,els)=>{ if(els.length) applyDrilldown(sch.agentCol, labels[els[0].index]); },
+      onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x} records`}}},
       scales:{x:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8'}}}}
-  });
+  }, titleAg);
 }
 
 function makeCatBarChart(col, rows, grid, horizontal){
@@ -1500,16 +1938,19 @@ function makeCatBarChart(col, rows, grid, horizontal){
   const colInfo = schema.cols.find(c=>c.header===col);
   const icon = TYPE_ICONS[colInfo?.type]||'📊';
   const id = `chart_${sanitizeId(col)}`;
-  const box = createChartBox(id, `${icon} ${col}`, false, horizontal&&labels.length>6);
+  const titleCat = `${icon} ${col}`;
+  const box = createChartBox(id, titleCat, false, horizontal&&labels.length>6);
   grid.appendChild(box);
   mkChart(id,{
     type:'bar',
     data:{labels,datasets:[{label:'Records',data,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderColor:labels.map((_,i)=>BORDERS[i%BORDERS.length]),borderWidth:2,borderRadius:5,borderSkipped:false}]},
     options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${horizontal?c.parsed.x:c.parsed.y} records`}}},
+      onClick:(e,els)=>{ if(els.length) applyDrilldown(col, labels[els[0].index]); },
+      onHover:(e,els)=>{ const cv=e.native?.target; if(cv) cv.style.cursor=els.length?'pointer':'default'; },
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>{ const v=horizontal?c.parsed.x:c.parsed.y; const pct=((v/data.reduce((s,x)=>s+x,0))*100).toFixed(1); return ` ${v} records (${pct}%)`; }}}},
       scales:{x:{beginAtZero:true,grid:{color:horizontal?'rgba(45,55,72,.5)':'none'},ticks:{precision:0,color:'#94a3b8',maxRotation:horizontal?0:30}},
               y:{grid:{color:horizontal?'none':'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8'}}}}
-  });
+  }, titleCat);
 }
 
 function makeResolutionTrendChart(rows, sch, grid){
@@ -1529,14 +1970,15 @@ function makeResolutionTrendChart(rows, sch, grid){
   const data = keys.map(k=>parseFloat((grps[k].reduce((s,v)=>s+v,0)/grps[k].length).toFixed(1)));
 
   const id = 'chart_res_trend';
-  const box = createChartBox(id, `⏱ Resolution Time Trend (${sch.secondaryDate} − ${sch.primaryDate})`);
+  const titleRT = `⏱ Resolution Time Trend (${sch.secondaryDate} − ${sch.primaryDate})`;
+  const box = createChartBox(id, titleRT);
   grid.appendChild(box);
   mkChart(id,{
     type:'line',
     data:{labels,datasets:[{label:'Avg Hours',data,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.12)',tension:.35,fill:true,pointRadius:4,pointBackgroundColor:'#f59e0b',borderWidth:2}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y}h avg`}}},
       scales:{x:{grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8',maxRotation:30}},y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8'}}}}
-  });
+  }, titleRT);
 }
 
 function buildCharts(rows, sch){
@@ -1789,8 +2231,8 @@ function setupAISection(rows){
 // ─────────────────────────────────────────────────────────
 // SAMPLE CSV
 // ─────────────────────────────────────────────────────────
-function downloadSampleCSV(){
-  const csv=`ID,Created Date,Closed Date,Title,Assigned To,State,Application,Priority,Region,Hours
+function getSampleCSV(){
+  return `ID,Created Date,Closed Date,Title,Assigned To,State,Application,Priority,Region,Hours
 TKT-001,1/4/2026 9:00:00 am,3/4/2026 2:30:00 pm,Login page not loading,Sarah Johnson <sarah@corp.com>,Resolved,Customer Portal,High,APAC,53.5
 TKT-002,2/4/2026 11:15:00 am,,Database connection timeout,Mike Chen <mike@corp.com>,Active,Core Banking,Critical,EMEA,
 TKT-003,3/4/2026 10:30:00 am,4/4/2026 11:00:00 am,Password reset not working,Priya Sharma <priya@corp.com>,Resolved,Identity Service,Medium,NAM,24.5
@@ -1810,7 +2252,10 @@ TKT-016,13/4/2026 10:00:00 am,,Webhook delivery failures,Mike Chen <mike@corp.co
 TKT-017,14/4/2026 9:00:00 am,15/4/2026 3:30:00 pm,Incorrect balance displayed,Priya Sharma <priya@corp.com>,Resolved,Core Banking,Critical,EMEA,54.5
 TKT-018,14/4/2026 11:30:00 am,,Two-factor auth not sending,Aisha Patel <aisha@corp.com>,Active,Identity Service,High,NAM,
 TKT-019,15/4/2026 2:00:00 pm,16/4/2026 10:00:00 am,Report PDF export blank,David Okonkwo <david@corp.com>,Resolved,Reporting Suite,Medium,APAC,20.0
-TKT-020,16/4/2026 9:00:00 am,,Payment processing timeout,Sarah Johnson <sarah@corp.com>,Active,Core Banking,Critical,EMEA,`;
+TKT-020,16/4/2026 9:00:00 am,,Payment processing timeout,Sarah Johnson <sarah@corp.com>,Active,Core Banking,Critical,EMEA,`;}
+
+function downloadSampleCSV(){
+  const csv=getSampleCSV();
   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   const a=Object.assign(document.createElement('a'),{href:url,download:'sample-data.csv'});
   a.click(); URL.revokeObjectURL(url);
@@ -1837,7 +2282,7 @@ async function downloadPDF(){
     pdf.addImage(imgData,'JPEG',0,pos,pw,imgH); left-=ph;
     while(left>0){ pos-=ph; pdf.addPage(); pdf.addImage(imgData,'JPEG',0,pos,pw,imgH); left-=ph; }
     pdf.save(`${currentFilename.replace(/\.\w+$/,'')}-dashboard.pdf`);
-    toast('PDF downloaded','success');
+    toast('PDF exported successfully','success');
   }catch(err){toast('PDF failed: '+err.message,'error');}
   finally{hideSpinner();btn.disabled=false;btn.querySelector('span:last-child').textContent='Export PDF';}
 }
@@ -1918,6 +2363,70 @@ document.addEventListener('DOMContentLoaded',()=>{
       ()=>toast('Copied to clipboard','success'),
       ()=>toast('Copy failed — select text manually','error')
     );
+  });
+
+  // Apply theme from session storage
+  applyTheme(false);
+
+  // Theme toggle
+  document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+  // Try sample data
+  document.getElementById('try-demo-btn').addEventListener('click', e=>{ e.stopPropagation(); tryWithSampleData(); });
+
+  // Share button
+  document.getElementById('btn-share').addEventListener('click', shareCurrentView);
+  document.getElementById('btn-share-mob').addEventListener('click', shareCurrentView);
+
+  // Mobile hamburger
+  const hamburger = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('hdr-mobile-menu');
+  hamburger.addEventListener('click', e=>{ e.stopPropagation(); mobileMenu.classList.toggle('open'); });
+  document.addEventListener('click', ()=>mobileMenu.classList.remove('open'));
+  mobileMenu.addEventListener('click', e=>e.stopPropagation());
+
+  // Mobile header action mirrors
+  document.getElementById('btn-upload-mob').addEventListener('click',()=>{ mobileMenu.classList.remove('open'); openFilePicker(); });
+  document.getElementById('btn-pdf-mob').addEventListener('click',()=>{ mobileMenu.classList.remove('open'); downloadPDF(); });
+  document.getElementById('btn-shortcuts-mob').addEventListener('click',()=>{ mobileMenu.classList.remove('open'); document.getElementById('shortcuts-modal').classList.add('on'); });
+
+  // Drilldown back
+  document.getElementById('drilldown-back').addEventListener('click', clearDrilldown);
+
+  // Fullscreen chart
+  document.getElementById('chart-fs-close').addEventListener('click', closeFullscreenChart);
+  document.getElementById('chart-fullscreen').addEventListener('click', e=>{ if(e.target===document.getElementById('chart-fullscreen')) closeFullscreenChart(); });
+
+  // Chart expand buttons (event delegation)
+  document.getElementById('charts-container').addEventListener('click', e=>{
+    const btn = e.target.closest('.chart-expand-btn');
+    if(btn) openFullscreenChart(btn.dataset.expand);
+  });
+  document.getElementById('charts-container').addEventListener('dblclick', e=>{
+    const body = e.target.closest('.chart-body[data-expand]');
+    if(body) openFullscreenChart(body.dataset.expand);
+  });
+
+  // Keyboard shortcuts modal
+  document.getElementById('shortcuts-close').addEventListener('click',()=>document.getElementById('shortcuts-modal').classList.remove('on'));
+  document.getElementById('shortcuts-modal').addEventListener('click', e=>{ if(e.target===document.getElementById('shortcuts-modal')) document.getElementById('shortcuts-modal').classList.remove('on'); });
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e=>{
+    const tag = e.target.tagName;
+    if(['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
+    if(e.key==='u'||e.key==='U'){ e.preventDefault(); openFilePicker(); }
+    else if(e.key==='r'||e.key==='R'){ e.preventDefault(); if(rawRows.length) resetFilters(); }
+    else if(e.key==='e'||e.key==='E'){ e.preventDefault(); if(rawRows.length&&!document.getElementById('btn-pdf').disabled) downloadPDF(); }
+    else if(e.key==='?'){ e.preventDefault(); document.getElementById('shortcuts-modal').classList.toggle('on'); }
+    else if(e.key==='Escape'){
+      document.getElementById('shortcuts-modal').classList.remove('on');
+      closeFullscreenChart();
+      document.getElementById('report-modal-wrap').classList.remove('on');
+      document.getElementById('preview-modal').classList.remove('on');
+      document.getElementById('add-filter-panel')?.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    }
   });
 
   // Filter bar toggle (collapse/expand)
