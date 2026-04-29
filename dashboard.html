@@ -620,67 +620,117 @@ function hideSpinner(){ document.getElementById('spinner').classList.remove('on'
 // ─────────────────────────────────────────────────────────
 function analyzeColumn(header, rows){
   const values = rows.map(r => r[header]);
-  const nonEmpty = values.filter(v => v!==null && v!==undefined && String(v).trim()!=='');
+  const nonEmpty = values.filter(v => v!==null && v!==undefined && String(v).trim()!=='' && String(v).trim()!=='-' && String(v).trim()!=='N/A');
   const strVals = nonEmpty.map(v => String(v).trim());
-  const sample = strVals.slice(0,50);
+  const sample = strVals.slice(0,60);
   const uniqueSet = new Set(strVals.map(v => v.toLowerCase()));
   const uniqueCount = uniqueSet.size;
   const h = header.toLowerCase().replace(/[\s_\-\.]+/g,'');
   const n = nonEmpty.length;
+  const total = values.length;
+  // Flag column as empty if fewer than 2% of rows have a value
+  const empty = n < Math.max(total * 0.02, 1);
+
+  // ─────────────────────────────────────────────────────────
+  // STEP 1: Strong header-name overrides — checked BEFORE value analysis.
+  // These prevent ambiguous value patterns (e.g. small integers) from
+  // triggering the wrong type.
+  // ─────────────────────────────────────────────────────────
+
+  // NUMBER header keywords (these must NEVER be detected as dates)
+  const numHdr = /complexity|score|rating|count|timeconsumed|timespent|timelog|timehours|hours|duration|effort|points|salary|revenue|cost|price|amount|qty|quantity|budget|weight|height|distance|size|percent|pct|avgtime|avghr/.test(h);
+
+  // TEXT header keywords
+  const textHdr = /description|detail|comment|remark|note|feedback|summary|subject|body|message|reason|resolution/.test(h);
+
+  // AGENT header keywords
+  const agentHdr = /assign|owner|handl|analyst|engineer|staff|employee|person|user/.test(h)
+    || /^name$/i.test(header.trim());
+
+  // Strong CATEGORY header keywords (exact match to avoid false positives)
+  const catHdr = /^(type|category|categ|region|area|zone|domain|dept|department|division|team|group|location|site|country|product|service|workitemtype|issuetype|applicationname|appname|complexityofissue)$/.test(h)
+    || /type|categ|region|area|zone|domain|dept|division|location|site|country/.test(h);
+
+  // Return early based on header keywords
+  if(numHdr){
+    if(empty) return {header, type:'number', uniqueCount, sample:[], empty:true};
+    // Verify with values — if most non-empty values are numeric, it's a number
+    const numSample = sample.slice(0,30);
+    const numParsed = numSample.filter(v=>!isNaN(parseFloat(v.replace(/[,$%\s]/g,'')))).length;
+    if(numParsed/Math.max(numSample.length,1) > 0.5){
+      return {header, type:'number', uniqueCount, sample:sample.slice(0,4)};
+    }
+    // Non-numeric values in a "number-named" column → treat as category
+    return {header, type:'category', uniqueCount, sample:sample.slice(0,4)};
+  }
+  if(textHdr) return {header, type:'text', uniqueCount, sample:sample.slice(0,4), empty};
+  if(agentHdr){
+    if(empty) return {header, type:'agent', uniqueCount, sample:[], empty:true};
+    const hasEmail = sample.slice(0,10).some(v=>/<[^>]+@[^>]+>/.test(v)||/\s+<.+>$/.test(v));
+    return {header, type:'agent', uniqueCount, sample:sample.slice(0,4)};
+  }
+
+  // Empty column without a strong name match → return as text (hidden downstream)
+  if(empty) return {header, type:'text', uniqueCount:0, sample:[], empty:true};
+
+  // ─────────────────────────────────────────────────────────
+  // STEP 2: Value-based detection (only for non-empty columns)
+  // ─────────────────────────────────────────────────────────
 
   // ── DATE ──
-  const dateHdr = /date|time|created|closed|opened|resolved|updated|modified|start|end|timestamp|at$|on$/i.test(h);
-  const dateParsed = sample.slice(0,20).filter(v => { const d=parseDate(v); return d&&!isNaN(d); }).length;
-  const datePct = dateParsed / Math.max(sample.slice(0,20).length,1);
-  if(datePct>0.65||(dateHdr&&dateParsed>=2)){
-    return {header,type:'date',uniqueCount,sample:sample.slice(0,4)};
+  // Strong date header: date/created/closed/timestamp/etc.
+  // Weak: "time" alone is ambiguous — only flag if values actually parse.
+  const dateHdrStrong = /date|created|closed|opened|resolved|updated|modified|start|end|timestamp/.test(h);
+  const dateSample = sample.slice(0,30);
+  const dateParsed = dateSample.filter(v=>{
+    const d = parseDate(v);
+    return d && !isNaN(d) && d.getFullYear()>=1990 && d.getFullYear()<=2100;
+  }).length;
+  const datePct = dateParsed / Math.max(dateSample.length,1);
+  // Require 30% of non-empty values to parse as dates (prevents small integers being dates)
+  // OR: strong date header with 10%+ match
+  if(datePct >= 0.30 || (dateHdrStrong && datePct >= 0.10 && dateParsed >= 1)){
+    return {header, type:'date', uniqueCount, sample:sample.slice(0,4)};
   }
 
   // ── ID ──
-  const idHdr = /^id$|^ticketid|^orderid|^employeeid|^recordid|^caseid|ticketno|orderno|^refno|^no$|^num$|^sr$|^ref$/.test(h)
+  const idHdrKw = /^id$|^ticketid|^orderid|^employeeid|^recordid|^caseid|ticketno|orderno|^refno|^no$|^num$|^sr$|^ref$/.test(h)
     || header.trim().toLowerCase()==='id';
   const idLike = sample.slice(0,20).filter(v=>/^[A-Za-z]{1,6}[-#\/]\d+$/.test(v)||/^#?\d{4,8}$/.test(v)).length;
   const isHighUnique = uniqueCount/Math.max(n,1)>0.85;
-  if(idHdr||(idLike/Math.max(sample.slice(0,20).length,1)>0.5&&isHighUnique)){
-    return {header,type:'id',uniqueCount,sample:sample.slice(0,4)};
+  if(idHdrKw||(idLike/Math.max(sample.slice(0,20).length,1)>0.5&&isHighUnique)){
+    return {header, type:'id', uniqueCount, sample:sample.slice(0,4)};
   }
-
-  // ── AGENT / NAME ──
-  const agentHdr = /assign|agent|owner|handl|by$|rep$|analyst|engineer|staff|employee$|person$|user$/i.test(h)
-    || /^name$/i.test(header.trim());
-  const hasEmail = sample.slice(0,10).some(v=>/<[^>]+@[^>]+>/.test(v)||/\s+<.+>$/.test(v));
-  if(agentHdr||hasEmail){ return {header,type:'agent',uniqueCount,sample:sample.slice(0,4)}; }
 
   // ── NUMBER ──
   const numSample = sample.slice(0,30);
   const numParsed = numSample.filter(v=>!isNaN(parseFloat(v.replace(/[,$%\s]/g,'')))).length;
-  if(numParsed/Math.max(numSample.length,1)>0.8&&uniqueCount>3&&!isHighUnique){
-    return {header,type:'number',uniqueCount,sample:sample.slice(0,4)};
+  if(numParsed/Math.max(numSample.length,1) > 0.75 && !isHighUnique){
+    return {header, type:'number', uniqueCount, sample:sample.slice(0,4)};
   }
 
   // ── PRIORITY ──
-  const priHdr = /prior|sever|urgency|impact|criticality|difficul/i.test(h);
+  const priHdrKw = /prior|sever|urgency|impact|criticality/.test(h);
   const priKw = new Set(['low','medium','high','critical','urgent','normal','p1','p2','p3','p4','minor','major','blocker','trivial','severe']);
   const priHits = sample.filter(v=>priKw.has(v.toLowerCase())).length;
-  if(priHdr||(priHits/Math.max(sample.length,1)>0.5&&uniqueCount<=6)){
-    return {header,type:'priority',uniqueCount,sample:sample.slice(0,4)};
+  if(priHdrKw||(priHits/Math.max(sample.length,1)>0.5&&uniqueCount<=6)){
+    return {header, type:'priority', uniqueCount, sample:sample.slice(0,4)};
   }
 
   // ── STATUS ──
-  const statHdr = /status|state|stage|phase|progress|condition|lifecycle/i.test(h);
+  const statHdrKw = /status|state|stage|phase|progress|condition|lifecycle/.test(h);
   const statKw = new Set(['open','closed','resolved','pending','in progress','on hold','cancelled','canceled','done','complete','completed','new','active','assigned','unassigned','escalated','reopened','wip','waiting','rejected','approved','inactive','not started','paused']);
   const statHits = sample.filter(v=>statKw.has(v.toLowerCase().trim())).length;
-  if(statHdr||(statHits/Math.max(sample.length,1)>0.35&&uniqueCount<=12)){
-    return {header,type:'status',uniqueCount,sample:sample.slice(0,4)};
+  if(statHdrKw||(statHits/Math.max(sample.length,1)>0.35&&uniqueCount<=12)){
+    return {header, type:'status', uniqueCount, sample:sample.slice(0,4)};
   }
 
   // ── CATEGORY ──
-  const catHdr = /type|categ|app|module|group|team|dept|department|region|area|zone|country|product|service|class|division|location|site|complex/i.test(h);
   if(catHdr||(uniqueCount>=2&&uniqueCount<=20&&n>=5)){
-    return {header,type:'category',uniqueCount,sample:sample.slice(0,4)};
+    return {header, type:'category', uniqueCount, sample:sample.slice(0,4)};
   }
 
-  return {header,type:'text',uniqueCount,sample:sample.slice(0,4)};
+  return {header, type:'text', uniqueCount, sample:sample.slice(0,4)};
 }
 
 function detectSchema(headers, rows){
@@ -688,39 +738,42 @@ function detectSchema(headers, rows){
   const byType = {};
   cols.forEach(c => { if(!byType[c.type]) byType[c.type]=[]; byType[c.type].push(c); });
 
+  // Helpers: only non-empty columns participate in schema roles
+  const live = type => (byType[type]||[]).filter(c=>!c.empty);
+
   // Date columns
-  const dateCols = byType['date']||[];
+  const dateCols = live('date');
   const prefCreated = dateCols.find(c=>/created|start|open|submit|raised|logged|report/i.test(c.header));
   const prefClosed  = dateCols.find(c=>/closed|close|end|resolv|complet|finish/i.test(c.header));
   const primaryDate   = (prefCreated||dateCols[0])?.header||null;
   const secondaryDate = (prefClosed||dateCols.find(c=>c.header!==primaryDate))?.header||null;
 
   // Status
-  const statCols = byType['status']||[];
+  const statCols = live('status');
   const statusCol = (statCols.find(c=>/^status$|^state$/i.test(c.header.trim()))||statCols.sort((a,b)=>a.uniqueCount-b.uniqueCount)[0])?.header||null;
 
   // Agent
-  const agentCols = byType['agent']||[];
+  const agentCols = live('agent');
   const agentCol = (agentCols.find(c=>/assign|agent/i.test(c.header))||agentCols[0])?.header||null;
 
   // Priority
-  const priCols = byType['priority']||[];
+  const priCols = live('priority');
   const priorityCol = (priCols.find(c=>/prior|sever/i.test(c.header))||priCols[0])?.header||null;
 
   // ID
-  const idCol = (byType['id']||[])[0]?.header||null;
+  const idCol = live('id')[0]?.header||null;
 
-  // Categorical: category-typed + extra status/priority/agent cols not already assigned
+  // Categorical: non-empty category-typed cols + overflow status/priority/agent cols
   const assigned = new Set([idCol,primaryDate,secondaryDate,statusCol,agentCol,priorityCol].filter(Boolean));
   const categoricalCols = [
-    ...(byType['category']||[]),
-    ...(byType['status']||[]).filter(c=>c.header!==statusCol),
-    ...(byType['priority']||[]).filter(c=>c.header!==priorityCol),
-    ...(byType['agent']||[]).filter(c=>c.header!==agentCol),
-  ].filter(c=>!assigned.has(c.header)).map(c=>c.header);
+    ...live('category'),
+    ...live('status').filter(c=>c.header!==statusCol),
+    ...live('priority').filter(c=>c.header!==priorityCol),
+    ...live('agent').filter(c=>c.header!==agentCol),
+  ].filter(c=>!assigned.has(c.header)&&c.uniqueCount>=2).map(c=>c.header);
 
-  const numberCols = (byType['number']||[]).map(c=>c.header);
-  const textCols   = (byType['text']||[]).map(c=>c.header);
+  const numberCols = live('number').map(c=>c.header);
+  const textCols   = live('text').map(c=>c.header);
 
   return { cols, idCol, primaryDate, secondaryDate, allDates:dateCols.map(c=>c.header), statusCol, agentCol, priorityCol, categoricalCols, numberCols, textCols };
 }
@@ -995,7 +1048,7 @@ function buildFilters(sch){
 
 function updateAddFilterPanel(sch){
   const panel = document.getElementById('add-filter-panel');
-  const remaining = (sch.cols||[]).filter(c=>!addedFilterCols.has(c.header)&&c.type!=='id');
+  const remaining = (sch.cols||[]).filter(c=>!addedFilterCols.has(c.header)&&c.type!=='id'&&!c.empty);
   if(!remaining.length){
     panel.innerHTML='<div class="afp-hdr">Add column filter</div><div class="afp-empty">All columns already added</div>';
     return;
@@ -1503,6 +1556,12 @@ function buildCharts(rows, sch){
   if(sch.priorityCol&&n<8){ makeCatBarChart(sch.priorityCol,rows,grid,false); n++; }
   if(sch.primaryDate&&sch.secondaryDate&&n<8){ makeResolutionTrendChart(rows,sch,grid); n++; }
   for(let i=1;i<cats.length&&n<8;i++){ makeCatBarChart(cats[i],rows,grid,true); n++; }
+  // Number columns: bar chart of value distribution
+  for(const numCol of (sch.numberCols||[])){
+    if(n>=8) break;
+    makeCatBarChart(numCol, rows, grid, false);
+    n++;
+  }
   if(!n) container.innerHTML = `<div style="text-align:center;padding:48px;color:var(--muted2);font-size:.88rem;">No chart-suitable columns detected in this dataset</div>`;
 }
 
@@ -1523,11 +1582,18 @@ function buildTable(rows, sch){
       const raw = row[h];
       const str = (raw!==null&&raw!==undefined&&String(raw).trim()!=='') ? String(raw).trim() : '';
       if(!str) return `<td style="color:var(--muted2)">—</td>`;
-      if(info.type==='id')     return `<td><span class="tid">${str}</span></td>`;
-      if(info.type==='date'){  const d=parseDate(str); return `<td>${d&&!isNaN(d)?formatDate(d):str}</td>`; }
-      if(info.type==='agent')  return `<td>${cleanAgentName(str)||str}</td>`;
-      if(info.type==='status') return `<td>${statusPill(str)}</td>`;
+      if(info.type==='id')       return `<td><span class="tid">${str}</span></td>`;
+      if(info.type==='date'){    const d=parseDate(str); return `<td>${d&&!isNaN(d)?formatDate(d):str}</td>`; }
+      if(info.type==='agent')    return `<td>${cleanAgentName(str)||str}</td>`;
+      if(info.type==='status')   return `<td>${statusPill(str)}</td>`;
       if(info.type==='priority') return `<td>${priorityPill(str)}</td>`;
+      if(info.type==='number'){
+        const nv=parseFloat(str.replace(/[,$%\s]/g,''));
+        if(!isNaN(nv)){
+          const isHrs=/hour|timeconsum|timespent|duration|hrs/i.test(info.header);
+          return `<td style="font-variant-numeric:tabular-nums">${isHrs?nv+'h':str}</td>`;
+        }
+      }
       if(str.length>50) return `<td title="${str.replace(/"/g,'&quot;')}">${str.slice(0,50)}…</td>`;
       return `<td>${str}</td>`;
     }).join('')}</tr>`).join('');
