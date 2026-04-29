@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IT Support Ticket Analytics</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Universal Data Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -21,43 +21,62 @@
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-/* ── Spinner overlay ── */
+/* ── Spinner ── */
 #spinner{position:fixed;inset:0;background:rgba(10,14,26,.85);display:none;place-items:center;z-index:9000;flex-direction:column;gap:14px}
 #spinner.on{display:flex}
 .spin-ring{width:44px;height:44px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 #spinner p{color:var(--muted);font-size:.85rem}
 
-/* ── Mapper modal ── */
-#mapper-wrap{position:fixed;inset:0;background:rgba(10,14,26,.8);display:none;place-items:center;z-index:8000;padding:20px;backdrop-filter:blur(4px)}
-#mapper-wrap.on{display:grid}
-#mapper-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:640px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
-.mapper-head{padding:22px 24px 16px;border-bottom:1px solid var(--border);position:relative}
-.mapper-head h2{font-size:1.05rem;font-weight:700;margin-bottom:4px}
-.mapper-head p{font-size:.8rem;color:var(--muted)}
-#mapper-close{position:absolute;right:18px;top:18px;background:none;border:none;color:var(--muted);font-size:1.3rem;cursor:pointer;line-height:1;padding:4px 8px;border-radius:6px}
-#mapper-close:hover{background:var(--surface2);color:var(--text)}
-.mapper-body{overflow-y:auto;padding:16px 24px}
-.mapper-table{width:100%;border-collapse:collapse}
-.mapper-table th{font-size:.68rem;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
-.mapper-table td{padding:10px 10px;border-bottom:1px solid rgba(45,55,72,.5);vertical-align:middle}
-.mapper-table tr:last-child td{border-bottom:none}
-.field-meta{display:flex;align-items:center;gap:8px}
-.field-icon{font-size:1.1rem}
-.field-name{font-size:.85rem;font-weight:600}
-.badge-req{font-size:.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3);padding:2px 6px;border-radius:10px}
-.badge-opt{font-size:.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:rgba(148,163,184,.1);color:var(--muted);border:1px solid var(--border);padding:2px 6px;border-radius:10px}
-.col-select{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius-sm);font-size:.82rem;outline:none;cursor:pointer}
-.col-select:focus{border-color:var(--accent)}
-.map-dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:.75rem;font-weight:700;flex-shrink:0}
-.map-dot.ok{background:rgba(16,185,129,.15);color:var(--green)}
-.map-dot.err{background:rgba(239,68,68,.15);color:var(--red)}
-.map-dot.skip{background:rgba(148,163,184,.1);color:var(--muted)}
-.mapper-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px}
-#mapper-apply{background:var(--accent);color:#fff;border:none;padding:10px 22px;border-radius:var(--radius-sm);font-weight:700;font-size:.85rem;cursor:pointer;transition:opacity .2s}
-#mapper-apply:disabled{opacity:.4;cursor:not-allowed}
-#mapper-apply:not(:disabled):hover{opacity:.85}
-#mapper-hint{font-size:.78rem;color:var(--muted);margin-left:auto}
+/* ── Upload Screen ── */
+#upload-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;overflow-y:auto}
+.upload-hero{width:100%;max-width:660px;text-align:center;padding:20px 0}
+.upload-logo{font-size:3.5rem;margin-bottom:16px}
+.upload-title{font-size:2.1rem;font-weight:800;line-height:1.15;margin-bottom:10px;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.upload-sub{font-size:1rem;color:var(--muted);margin-bottom:32px}
+#drop-zone{border:2px dashed var(--border2);border-radius:var(--radius);padding:48px 28px;cursor:pointer;transition:all .2s;background:var(--surface);position:relative}
+#drop-zone:hover,#drop-zone.over{border-color:var(--accent);background:rgba(99,102,241,.07)}
+#drop-zone.over{transform:scale(1.01)}
+.dz-icon{font-size:3rem;margin-bottom:14px;display:block}
+#drop-zone h3{font-size:1.05rem;font-weight:700;margin-bottom:6px}
+#drop-zone p{font-size:.84rem;color:var(--muted)}
+.click-link{color:var(--accent);text-decoration:underline;cursor:pointer}
+.drop-hint{margin-top:8px;font-size:.74rem;color:var(--muted2)}
+.drop-actions{margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.col-types-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:24px 0 8px}
+.col-type-chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:.78rem;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:5px;transition:border-color .2s}
+.col-type-chip:hover{border-color:var(--border2)}
+.works-with{margin-top:22px;font-size:.78rem;color:var(--muted2)}
+.works-tags{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.works-tag{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:.74rem;color:var(--muted)}
+
+/* ── Preview Modal ── */
+#preview-modal{position:fixed;inset:0;background:rgba(10,14,26,.88);display:none;place-items:center;z-index:8000;padding:20px;backdrop-filter:blur(6px)}
+#preview-modal.on{display:grid}
+.preview-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:680px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.preview-head{padding:22px 24px 16px;border-bottom:1px solid var(--border)}
+.preview-head h2{font-size:1.08rem;font-weight:700;margin-bottom:4px}
+.preview-head p{font-size:.8rem;color:var(--muted)}
+.preview-body{padding:20px 24px;overflow-y:auto;flex:1}
+.col-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.col-badge{display:flex;align-items:center;gap:7px;border-radius:9px;padding:8px 12px;font-size:.78rem;border:1px solid var(--border);background:var(--surface2);transition:transform .15s}
+.col-badge:hover{transform:translateY(-1px)}
+.col-badge.type-date{border-color:rgba(6,182,212,.4);background:rgba(6,182,212,.07)}
+.col-badge.type-status{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07)}
+.col-badge.type-agent{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.07)}
+.col-badge.type-priority{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.07)}
+.col-badge.type-category{border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.07)}
+.col-badge.type-number{border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.07)}
+.col-badge.type-id{border-color:rgba(148,163,184,.35)}
+.cb-icon{font-size:1rem;flex-shrink:0}
+.cb-name{font-weight:700;color:var(--text);line-height:1.2}
+.cb-type{font-size:.64rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.preview-summary{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;flex-direction:column;gap:7px}
+.ps-row{display:flex;align-items:flex-start;gap:8px;font-size:.8rem;color:var(--muted);line-height:1.4}
+.ps-ok{color:var(--green);flex-shrink:0;font-size:.88rem}
+.ps-warn{color:var(--yellow);flex-shrink:0;font-size:.88rem}
+.preview-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.preview-note{font-size:.76rem;color:var(--muted2);margin-left:auto}
 
 /* ── Header ── */
 header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
@@ -70,145 +89,29 @@ header p{font-size:.73rem;color:var(--muted);margin-top:1px}
 .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn-primary:hover{opacity:.88;background:var(--accent);border-color:var(--accent)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* ── Upload zone ── */
-#upload-wrap{padding:24px 28px 0}
-#drop-zone{border:2px dashed var(--border2);border-radius:var(--radius);padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface)}
-#drop-zone:hover,#drop-zone.over{border-color:var(--accent);background:var(--accent-dim)}
-#drop-zone.over{transform:scale(1.01)}
-.drop-icon{font-size:2.8rem;margin-bottom:12px;display:block}
-#drop-zone h3{font-size:1rem;font-weight:700;margin-bottom:6px}
-#drop-zone p{font-size:.82rem;color:var(--muted)}
-.click-link{color:var(--accent);text-decoration:underline;cursor:pointer}
-.drop-hint{margin-top:10px;font-size:.75rem;color:var(--muted2)}
-.drop-actions{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-
-/* ── Banners ── */
-.banner{padding:11px 28px;font-size:.82rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-#demo-notice{background:rgba(99,102,241,.08);border-bottom:1px solid rgba(99,102,241,.2);color:var(--muted)}
-#demo-notice strong{color:var(--accent)}
-#source-bar{background:var(--surface);border-bottom:1px solid var(--border);display:none}
-#source-bar .src-info{color:var(--text);font-weight:600;display:flex;align-items:center;gap:8px}
-#source-bar .src-actions{margin-left:auto;display:flex;gap:8px}
 .btn-sm{padding:5px 12px;font-size:.75rem;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-weight:600;transition:all .15s}
 .btn-sm:hover{background:var(--surface3)}
 
-/* ── Dashboard printable area ── */
-#printable{padding:24px 28px;max-width:1600px;margin:0 auto}
-
-/* ── KPI Cards ── */
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:22px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
-.kpi-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
-.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
-.kpi-blue::after{background:var(--accent)}
-.kpi-red::after{background:var(--red)}
-.kpi-yellow::after{background:var(--yellow)}
-.kpi-green::after{background:var(--green)}
-.kpi-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);margin-bottom:8px}
-.kpi-value{font-size:2rem;font-weight:800;line-height:1;margin-bottom:4px}
-.kpi-blue .kpi-value{color:var(--accent)}
-.kpi-red .kpi-value{color:var(--red)}
-.kpi-yellow .kpi-value{color:var(--yellow)}
-.kpi-green .kpi-value{color:var(--green)}
-.kpi-sub{font-size:.73rem;color:var(--muted)}
-.kpi-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:2.2rem;opacity:.07}
-
-/* ── Chart boxes ── */
-.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
-.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.chart-hdr h3{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:8px}
-.chart-body{position:relative;height:260px}
-.chart-placeholder{position:absolute;inset:0;display:none;place-items:center;flex-direction:column;gap:8px;color:var(--muted2);font-size:.82rem}
-.chart-placeholder .ph-icon{font-size:2rem;opacity:.4}
-.chart-grid-2{display:grid;grid-template-columns:1.55fr 1fr;gap:18px;margin-bottom:18px}
-.chart-single{margin-bottom:18px}
-
-/* ── Table ── */
-.table-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
-.table-box h3{font-size:.88rem;font-weight:700;margin-bottom:16px}
-.tbl-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.81rem}
-thead th{padding:9px 14px;font-size:.67rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
-tbody tr{border-bottom:1px solid rgba(45,55,72,.5);transition:background .12s}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:var(--surface2)}
-tbody td{padding:10px 14px;white-space:nowrap}
-.tid{font-family:monospace;color:var(--accent);font-weight:700;font-size:.8rem}
-
-/* ── Status / Priority Pills ── */
-.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700;letter-spacing:.3px}
-.p-open{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
-.p-resolved{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3)}
-.p-pending{background:rgba(245,158,11,.12);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
-.p-other{background:rgba(148,163,184,.1);color:var(--muted);border:1px solid var(--border)}
-.p-low{background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.3)}
-.p-medium{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
-.p-high{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3)}
-.p-critical{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.3)}
-
-/* ── Toasts ── */
-#toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none}
-.toast{background:var(--surface2);border:1px solid var(--border);padding:11px 18px;border-radius:var(--radius-sm);font-size:.82rem;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:auto;max-width:320px}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast-success{border-color:var(--green);color:var(--green)}
-.toast-error{border-color:var(--red);color:var(--red)}
-.toast-info{border-color:var(--accent);color:var(--accent)}
-/* Mapping summary toast */
-.toast-map{max-width:420px;border-color:var(--green)}
-.mt-head{font-weight:700;color:var(--green);font-size:.82rem;margin-bottom:9px;display:flex;align-items:center;gap:6px}
-.mt-head em{color:var(--muted);font-style:normal;font-weight:400;font-size:.75rem}
-.mt-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
-.mt-row{display:flex;align-items:center;gap:6px;font-size:.74rem;overflow:hidden}
-.mt-field{color:var(--muted);white-space:nowrap;flex-shrink:0}
-.mt-sep{color:var(--muted2);flex-shrink:0}
-.mt-col{font-family:monospace;color:var(--accent);background:var(--accent-dim);padding:1px 6px;border-radius:4px;font-size:.71rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
-.mt-missed{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:.73rem;color:var(--yellow)}
-.mt-extra{margin-top:7px;padding-top:7px;border-top:1px solid var(--border);font-size:.73rem;color:var(--cyan)}
-
-/* ── Section label ── */
-.sec-label{font-size:.67rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:block}
+/* ── Source bar ── */
+.banner{padding:11px 28px;font-size:.82rem;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#source-bar{background:var(--surface);border-bottom:1px solid var(--border);display:none}
+.src-info{color:var(--text);font-weight:600;display:flex;align-items:center;gap:8px}
+.src-actions{margin-left:auto;display:flex;gap:8px}
 
 /* ── Filter bar ── */
 #filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px}
 .filter-hdr{display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:.8rem;font-weight:700;color:var(--muted)}
-#filter-badge{background:var(--accent);color:#fff;border-radius:20px;padding:1px 8px;font-size:.65rem;font-weight:800}
+#filter-badge{background:var(--accent);color:#fff;border-radius:20px;padding:1px 8px;font-size:.65rem;font-weight:800;display:none}
 .filter-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
-.filter-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:110px}
+.filter-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:110px;max-width:200px}
 .filter-group label{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
 .filter-input,.filter-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:var(--radius-sm);font-size:.82rem;outline:none;width:100%;height:34px;transition:border-color .15s}
 .filter-input:focus,.filter-select:focus{border-color:var(--accent)}
 .filter-input[type="date"]{color-scheme:dark}
 .filter-input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5) brightness(1.5);cursor:pointer}
 .filter-actions{display:flex;gap:8px;align-items:flex-end;flex-shrink:0;padding-bottom:0}
-.filter-summary{margin-top:11px;padding-top:11px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
+#filter-summary{margin-top:11px;padding-top:11px;border-top:1px solid var(--border);display:none;align-items:center;gap:8px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
 .filter-tag{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(99,102,241,.3);padding:3px 10px;border-radius:20px;font-size:.71rem;font-weight:600}
-
-/* ── Dynamic insight charts ── */
-#dynamic-section{margin-bottom:18px}
-.dynamic-label{font-size:.67rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:block}
-.dynamic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
-
-/* ── Empty state ── */
-#empty-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;gap:12px;min-height:360px}
-.empty-icon{font-size:3.5rem;opacity:.3}
-#empty-state h3{font-size:1rem;font-weight:700}
-#empty-state p{font-size:.83rem;color:var(--muted2)}
-
-/* ── Responsive ── */
-@media(max-width:900px){
-  #printable{padding:16px}
-  #upload-wrap{padding:16px 16px 0}
-  .banner{padding:10px 16px}
-  header{padding:12px 16px}
-  .chart-grid-2{grid-template-columns:1fr}
-  .hdr-actions .btn span{display:none}
-}
-@media(max-width:480px){
-  .cards-grid{grid-template-columns:1fr 1fr}
-  header h1{font-size:1rem}
-  .kpi-value{font-size:1.6rem}
-}
 
 /* ── AI Key Bar ── */
 #ai-key-bar{background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.07));border-bottom:1px solid rgba(99,102,241,.22);padding:12px 28px}
@@ -221,33 +124,91 @@ tbody td{padding:10px 14px;white-space:nowrap}
 .ai-key-hint{font-size:.72rem;color:var(--muted2);margin-left:auto}
 @media(max-width:700px){.ai-key-hint{display:none}}
 
+/* ── Printable area ── */
+#printable{padding:24px 28px;max-width:1600px;margin:0 auto}
+
+/* ── KPI Cards ── */
+.sec-label{font-size:.67rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted2);margin-bottom:12px;display:block}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:22px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.kpi-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.kpi-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.kpi-blue::after{background:var(--accent)}.kpi-red::after{background:var(--red)}
+.kpi-yellow::after{background:var(--yellow)}.kpi-green::after{background:var(--green)}
+.kpi-cyan::after{background:var(--cyan)}.kpi-orange::after{background:var(--orange)}
+.kpi-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:var(--muted);margin-bottom:8px}
+.kpi-value{font-size:2rem;font-weight:800;line-height:1;margin-bottom:4px}
+.kpi-blue .kpi-value{color:var(--accent)}.kpi-red .kpi-value{color:var(--red)}
+.kpi-yellow .kpi-value{color:var(--yellow)}.kpi-green .kpi-value{color:var(--green)}
+.kpi-cyan .kpi-value{color:var(--cyan)}.kpi-orange .kpi-value{color:var(--orange)}
+.kpi-sub{font-size:.73rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:2.2rem;opacity:.07}
+
+/* ── Charts grid ── */
+.charts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:18px;margin-bottom:18px}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px}
+.chart-box.chart-full{grid-column:1/-1}
+.chart-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.chart-hdr h3{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:8px}
+.chart-body{position:relative;height:260px}
+.chart-body.tall{height:300px}
+.chart-no-data{display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted2);font-size:.82rem;flex-direction:column;gap:8px}
+.chart-no-data .no-icon{font-size:2rem;opacity:.3}
+
+/* ── Table ── */
+.table-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:18px}
+.table-box h3{font-size:.88rem;font-weight:700;margin-bottom:16px}
+.tbl-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.81rem}
+thead th{padding:9px 14px;font-size:.67rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(45,55,72,.5);transition:background .12s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+tbody td{padding:10px 14px;white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+.tid{font-family:monospace;color:var(--accent);font-weight:700;font-size:.8rem}
+
+/* ── Pills ── */
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:700;letter-spacing:.3px}
+.p-open{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.p-resolved{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3)}
+.p-pending{background:rgba(245,158,11,.12);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
+.p-other{background:rgba(148,163,184,.1);color:var(--muted);border:1px solid var(--border)}
+.p-low{background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.3)}
+.p-medium{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
+.p-high{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.p-critical{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.3)}
+
+/* ── Toasts ── */
+#toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;pointer-events:none}
+.toast{background:var(--surface2);border:1px solid var(--border);padding:11px 18px;border-radius:var(--radius-sm);font-size:.82rem;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:auto;max-width:360px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast-success{border-color:var(--green);color:var(--green)}
+.toast-error{border-color:var(--red);color:var(--red)}
+.toast-info{border-color:var(--accent);color:var(--accent)}
+
+/* ── Empty state ── */
+#empty-state{display:none;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;gap:12px;min-height:360px}
+.empty-icon{font-size:3.5rem;opacity:.3}
+#empty-state h3{font-size:1rem;font-weight:700}
+#empty-state p{font-size:.83rem;color:var(--muted2)}
+
 /* ── AI Section ── */
 #ai-section{margin-bottom:18px}
 .ai-sec-label{font-size:.67rem;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .ai-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:2px 7px;border-radius:10px;font-size:.6rem;letter-spacing:.4px;font-weight:800}
-
-/* ── AI Cards ── */
 .ai-card{background:var(--surface);border:1px solid rgba(99,102,241,.3);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;position:relative;overflow:hidden}
 .ai-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2),#06b6d4);border-radius:var(--radius) var(--radius) 0 0}
 .ai-card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px}
 .ai-card-hdr h3{font-size:.88rem;font-weight:700;display:flex;align-items:center;gap:8px}
-
-/* ── AI states ── */
 .ai-loading{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.83rem;padding:4px 0;min-height:36px}
 .mini-spin{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
 .ai-locked{color:var(--muted2);font-size:.83rem;padding:4px 0;display:flex;align-items:center;gap:8px}
 .ai-error{color:var(--red);font-size:.81rem;padding:4px 0}
-
-/* ── Summary ── */
 .ai-summary-text{font-size:.87rem;line-height:1.75;color:var(--text)}
 .ai-summary-text strong{color:var(--accent2)}
-
-/* ── Two-col AI row ── */
 .ai-two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:16px;align-items:start}
 .ai-two-col .ai-card{margin-bottom:0}
 @media(max-width:820px){.ai-two-col{grid-template-columns:1fr}}
-
-/* ── Anomaly alerts ── */
 .anomaly-list{display:flex;flex-direction:column;gap:8px}
 .anomaly-item{display:flex;align-items:flex-start;gap:10px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.22);border-radius:var(--radius-sm);padding:10px 12px}
 .anomaly-item.sev-high{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.25)}
@@ -255,15 +216,11 @@ tbody td{padding:10px 14px;white-space:nowrap}
 .anomaly-msg{flex:1;font-size:.81rem;color:var(--text);line-height:1.5}
 .anomaly-dismiss{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:1rem;padding:0;flex-shrink:0;margin-top:1px;line-height:1}
 .anomaly-dismiss:hover{color:var(--text)}
-
-/* ── Predictions ── */
 .prediction-list{display:flex;flex-direction:column;gap:9px}
 .prediction-item{display:flex;gap:11px;padding:11px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm)}
 .pred-icon{font-size:1.3rem;flex-shrink:0;line-height:1.3}
 .pred-text{font-size:.82rem;color:var(--text);line-height:1.5}
 .pred-conf{font-size:.7rem;color:var(--muted2);margin-top:3px}
-
-/* ── Agent cards ── */
 .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .agent-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px}
 .agent-card-name{font-weight:700;font-size:.86rem;margin-bottom:8px}
@@ -274,8 +231,6 @@ tbody td{padding:10px 14px;white-space:nowrap}
 .st-balanced{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.3)}
 .st-underutilized{background:rgba(148,163,184,.1);color:var(--muted);border:1px solid var(--border)}
 .agent-rec{font-size:.74rem;color:var(--muted);line-height:1.5;border-top:1px solid var(--border);padding-top:8px}
-
-/* ── Manager Report CTA ── */
 .ai-report-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .ai-report-desc{font-size:.82rem;color:var(--muted);line-height:1.5}
 
@@ -289,6 +244,23 @@ tbody td{padding:10px 14px;white-space:nowrap}
 #report-close-x:hover{background:var(--surface2);color:var(--text)}
 #report-modal-body{overflow-y:auto;padding:22px 24px;flex:1;font-size:.88rem;line-height:1.85;color:var(--text);white-space:pre-wrap}
 .report-modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  #printable{padding:16px}
+  header{padding:12px 16px}
+  .banner{padding:10px 16px}
+  #filter-bar{padding:12px 16px}
+  .charts-grid{grid-template-columns:1fr}
+  .chart-box.chart-full{grid-column:auto}
+  .hdr-actions .btn span:last-child{display:none}
+}
+@media(max-width:480px){
+  .cards-grid{grid-template-columns:1fr 1fr}
+  header h1{font-size:1rem}
+  .kpi-value{font-size:1.6rem}
+  .upload-title{font-size:1.5rem}
+}
 </style>
 </head>
 <body>
@@ -296,236 +268,149 @@ tbody td{padding:10px 14px;white-space:nowrap}
 <!-- Spinner -->
 <div id="spinner"><div class="spin-ring"></div><p id="spin-msg">Processing…</p></div>
 
-<!-- Column Mapper Modal -->
-<div id="mapper-wrap">
-  <div id="mapper-card">
-    <div class="mapper-head">
-      <button id="mapper-close" title="Cancel">✕</button>
-      <h2>🗂 Map File Columns</h2>
-      <p id="mapper-sub">Confirm how your File columns map to dashboard fields</p>
+<!-- Upload Screen -->
+<div id="upload-screen">
+  <div class="upload-hero">
+    <div class="upload-logo">📊</div>
+    <h1 class="upload-title">Universal Data Dashboard</h1>
+    <p class="upload-sub">Drop any CSV or Excel file. We'll figure out the rest.</p>
+    <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
+    <div id="drop-zone">
+      <span class="dz-icon">📂</span>
+      <h3>Drag &amp; drop your file here</h3>
+      <p>or <span class="click-link" id="browse-link">click to browse</span></p>
+      <p class="drop-hint">Supports .csv · .xlsx · .xls &nbsp;·&nbsp; Any column names &nbsp;·&nbsp; Auto-detects everything</p>
+      <div class="drop-actions">
+        <button class="btn btn-primary" id="dl-sample-btn">⬇ Download Sample CSV</button>
+      </div>
     </div>
-    <div class="mapper-body">
-      <table class="mapper-table">
-        <thead><tr><th>Dashboard Field</th><th>Your File Column</th><th></th></tr></thead>
-        <tbody id="mapper-rows"></tbody>
-      </table>
+    <div class="col-types-row">
+      <div class="col-type-chip">📅 Dates</div>
+      <div class="col-type-chip">🔵 Status</div>
+      <div class="col-type-chip">👤 Agents / Names</div>
+      <div class="col-type-chip">⚡ Priority</div>
+      <div class="col-type-chip">📊 Categories</div>
+      <div class="col-type-chip">🔢 Numbers</div>
     </div>
-    <div class="mapper-foot">
-      <button id="mapper-apply" class="btn btn-primary">Apply &amp; View Dashboard</button>
-      <span id="mapper-hint"></span>
+    <div class="works-with">Works with any kind of data:</div>
+    <div class="works-tags">
+      <div class="works-tag">🎫 IT Support Tickets</div>
+      <div class="works-tag">👥 HR Records</div>
+      <div class="works-tag">💰 Sales Data</div>
+      <div class="works-tag">📋 Any CSV file</div>
     </div>
   </div>
 </div>
 
-<!-- Header -->
-<header>
-  <div class="logo-box">🎫</div>
-  <div>
-    <h1>IT Support Analytics</h1>
-    <p>Upload ADO Extracted data or explore with demo</p>
-  </div>
-  <div class="hdr-actions">
-    <button class="btn btn-primary" id="btn-upload-hdr"><span>⬆</span> <span>Upload File</span></button>
-    <button class="btn" id="btn-pdf" disabled><span>⬇</span> <span>Export PDF</span></button>
-  </div>
-</header>
-
-<!-- Upload zone -->
-<div id="upload-wrap">
-  <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
-  <div id="drop-zone">
-    <span class="drop-icon">📤</span>
-    <h3>Drop your file here</h3>
-    <p>or <span class="click-link" id="browse-link">click to browse</span></p>
-    <p class="drop-hint">Supports .csv, .xlsx, .xls · Any column names · Auto-detects fields</p>
-    <div class="drop-actions">
-      <button class="btn btn-sm" id="dl-sample-btn">⬇ Download Sample CSV</button>
+<!-- Column Preview Modal -->
+<div id="preview-modal">
+  <div class="preview-card">
+    <div class="preview-head">
+      <h2 id="preview-head-title">Detected Columns</h2>
+      <p id="preview-head-sub"></p>
+    </div>
+    <div class="preview-body">
+      <div class="col-badges" id="preview-badges"></div>
+      <div class="preview-summary" id="preview-summary"></div>
+    </div>
+    <div class="preview-foot">
+      <button class="btn btn-primary" id="preview-confirm-btn">Load Dashboard →</button>
+      <button class="btn" id="preview-cancel-btn">Cancel</button>
+      <span class="preview-note" id="preview-note"></span>
     </div>
   </div>
 </div>
 
-<!-- Demo notice -->
-<div class="banner" id="demo-notice">
-  <span>ℹ️ Showing <strong>50 sample tickets</strong>. Upload your own file to analyse real data.</span>
-  <button class="btn-sm" id="demo-upload-btn">Upload File</button>
-</div>
+<!-- Main App (shown after file load) -->
+<div id="main-app" style="display:none">
+  <header>
+    <div class="logo-box">📊</div>
+    <div>
+      <h1 id="hdr-title">Universal Data Dashboard</h1>
+      <p id="hdr-sub">Upload any CSV or Excel file to begin</p>
+    </div>
+    <div class="hdr-actions">
+      <button class="btn btn-primary" id="btn-upload-hdr"><span>⬆</span><span>Upload File</span></button>
+      <button class="btn" id="btn-pdf" disabled><span>⬇</span><span>Export PDF</span></button>
+    </div>
+  </header>
 
-<!-- Source bar (shown after real CSV loaded) -->
-<div class="banner" id="source-bar">
-  <div class="src-info">📄 <span id="src-name"></span> &nbsp;·&nbsp; <span id="src-rows"></span> rows loaded</div>
-  <div class="src-actions">
-    <button class="btn-sm" id="btn-remap">Re-map Columns</button>
-    <button class="btn-sm" id="btn-change-file">Change File</button>
-  </div>
-</div>
-
-<!-- Filter bar -->
-<div id="filter-bar">
-  <div class="filter-hdr">
-    🔍 Filters
-    <span id="filter-badge" style="display:none">0</span>
-  </div>
-  <div class="filter-row">
-    <div class="filter-group">
-      <label for="f-date-from">From Date</label>
-      <input type="date" id="f-date-from" class="filter-input">
-    </div>
-    <div class="filter-group">
-      <label for="f-date-to">To Date</label>
-      <input type="date" id="f-date-to" class="filter-input">
-    </div>
-    <div class="filter-group">
-      <label for="f-category">Category</label>
-      <select id="f-category" class="filter-select"><option value="">All Categories</option></select>
-    </div>
-    <div class="filter-group">
-      <label for="f-priority">Priority</label>
-      <select id="f-priority" class="filter-select"><option value="">All Priorities</option></select>
-    </div>
-    <div class="filter-group">
-      <label for="f-status">Status</label>
-      <select id="f-status" class="filter-select"><option value="">All Statuses</option></select>
-    </div>
-    <div class="filter-actions">
-      <button class="btn btn-primary" id="btn-apply-filters">Apply Filters</button>
-      <button class="btn" id="btn-reset-filters">Reset</button>
-    </div>
-  </div>
-  <div class="filter-summary" id="filter-summary" style="display:none">
-    Showing <strong id="filter-count-shown"></strong> of <strong id="filter-count-total"></strong> tickets
-    &nbsp;·&nbsp;
-    <span id="active-filter-tags"></span>
-  </div>
-</div>
-
-<!-- AI Key Bar -->
-<div id="ai-key-bar">
-  <div class="ai-key-inner">
-    <span class="ai-key-label">🤖 AI Insights</span>
-    <input type="password" id="ai-key-input" placeholder="sk-ant-… Paste Anthropic API key to unlock AI insights">
-    <button class="btn btn-primary" id="ai-key-save" style="flex-shrink:0;padding:7px 14px">Save Key</button>
-    <span id="ai-key-saved" class="ai-key-saved-txt" style="display:none">🔒 Key saved — AI features active</span>
-    <button id="ai-key-clear" class="btn-sm" style="display:none">✕ Clear</button>
-    <span class="ai-key-hint">Stored in memory only · never sent anywhere except Anthropic</span>
-  </div>
-</div>
-
-<!-- Printable dashboard -->
-<div id="printable">
-  <div id="empty-state">
-    <div class="empty-icon">🔍</div>
-    <h3>No tickets match your filters</h3>
-    <p>Try adjusting or resetting the filter criteria</p>
-    <button class="btn" onclick="resetFilters()" style="margin-top:8px">↺ Reset Filters</button>
-  </div>
-  <div id="dashboard-content">
-  <span class="sec-label">Overview</span>
-  <div class="cards-grid">
-    <div class="kpi-card kpi-blue"><div class="kpi-label">Total Tickets</div><div class="kpi-value" id="k-total">—</div><div class="kpi-sub" id="k-total-sub"></div><div class="kpi-icon">🎫</div></div>
-    <div class="kpi-card kpi-red"><div class="kpi-label">Open Tickets</div><div class="kpi-value" id="k-open">—</div><div class="kpi-sub" id="k-open-sub"></div><div class="kpi-icon">🔴</div></div>
-    <div class="kpi-card kpi-yellow"><div class="kpi-label">Avg Resolution</div><div class="kpi-value" id="k-avg">—</div><div class="kpi-sub" id="k-avg-sub"></div><div class="kpi-icon">⏱</div></div>
-    <div class="kpi-card kpi-green"><div class="kpi-label">Resolution Rate</div><div class="kpi-value" id="k-rate">—</div><div class="kpi-sub" id="k-rate-sub"></div><div class="kpi-icon">✅</div></div>
-  </div>
-
-  <div class="chart-single">
-    <div class="chart-box">
-      <div class="chart-hdr"><h3>📈 Ticket Volume Over Time</h3></div>
-      <div class="chart-body">
-        <canvas id="lineChart"></canvas>
-        <div class="chart-placeholder" id="ph-line"><span class="ph-icon">📅</span><span>Date column not mapped</span></div>
-      </div>
+  <div class="banner" id="source-bar">
+    <div class="src-info">📄 <span id="src-name"></span>&nbsp;·&nbsp;<span id="src-rows"></span> rows loaded</div>
+    <div class="src-actions">
+      <button class="btn-sm" id="btn-view-cols">🔍 Column Types</button>
+      <button class="btn-sm" id="btn-change-file">📂 Change File</button>
     </div>
   </div>
 
-  <div class="chart-grid-2">
-    <div class="chart-box">
-      <div class="chart-hdr"><h3>📊 Tickets by <span id="bar-chart-field">Category</span></h3></div>
-      <div class="chart-body">
-        <canvas id="barChart"></canvas>
-        <div class="chart-placeholder" id="ph-bar"><span class="ph-icon">📂</span><span>Category column not mapped</span></div>
-      </div>
-    </div>
-    <div class="chart-box">
-      <div class="chart-hdr"><h3>🥧 Status Distribution</h3></div>
-      <div class="chart-body">
-        <canvas id="pieChart"></canvas>
-        <div class="chart-placeholder" id="ph-pie"><span class="ph-icon">🔵</span><span>Status column not mapped</span></div>
-      </div>
+  <div id="filter-bar">
+    <div class="filter-hdr">🔍 Filters <span id="filter-badge"></span></div>
+    <div class="filter-row" id="filter-row"></div>
+    <div id="filter-summary"></div>
+  </div>
+
+  <div id="ai-key-bar">
+    <div class="ai-key-inner">
+      <span class="ai-key-label">🤖 AI Insights</span>
+      <input type="password" id="ai-key-input" placeholder="sk-ant-… Paste Anthropic API key to unlock AI insights">
+      <button class="btn btn-primary" id="ai-key-save" style="flex-shrink:0;padding:7px 14px">Save Key</button>
+      <span id="ai-key-saved" class="ai-key-saved-txt" style="display:none">🔒 Key saved — AI features active</span>
+      <button id="ai-key-clear" class="btn-sm" style="display:none">✕ Clear</button>
+      <span class="ai-key-hint">Stored in memory only · never sent anywhere except Anthropic</span>
     </div>
   </div>
 
-  <div class="chart-single" style="margin-bottom:18px">
-    <div class="chart-box">
-      <div class="chart-hdr"><h3>⚡ Priority Breakdown by Status</h3></div>
-      <div class="chart-body">
-        <canvas id="priorityChart"></canvas>
-        <div class="chart-placeholder" id="ph-pri"><span class="ph-icon">⚡</span><span>Priority column not mapped</span></div>
-      </div>
+  <div id="printable">
+    <div id="empty-state">
+      <div class="empty-icon">🔍</div>
+      <h3>No records match your filters</h3>
+      <p>Try adjusting or resetting the filter criteria</p>
+      <button class="btn" onclick="resetFilters()" style="margin-top:8px">↺ Reset Filters</button>
     </div>
-  </div>
-
-  <!-- Dynamic insight charts (auto-generated from extra CSV columns) -->
-  <div id="dynamic-section" style="display:none">
-    <span class="dynamic-label">📊 Additional Insights</span>
-    <div id="dynamic-grid" class="dynamic-grid"></div>
-  </div>
-
-  <!-- AI-Powered Insights Section -->
-  <div id="ai-section" style="display:none">
-    <div class="ai-sec-label">🤖 <span>AI-Powered Insights</span> <span class="ai-badge">POWERED BY CLAUDE</span></div>
-
-    <!-- Locked placeholder (no API key) -->
-    <div id="ai-locked-state" class="ai-card">
-      <div class="ai-locked">🔒 Enter your Anthropic API key in the bar above to unlock AI-powered summaries, anomaly detection, agent analysis, and predictive insights.</div>
-    </div>
-
-    <!-- Auto Summary -->
-    <div id="ai-summary-card" class="ai-card" style="display:none">
-      <div class="ai-card-hdr">
-        <h3>✨ Auto Summary</h3>
-        <button class="btn-sm" id="ai-regen-btn">↺ Regenerate</button>
-      </div>
-      <div id="ai-summary-body"><div class="ai-loading"><div class="mini-spin"></div>Analyzing ticket data…</div></div>
-    </div>
-
-    <!-- Anomalies + Predictions (two-col) -->
-    <div class="ai-two-col" id="ai-two-col-wrap" style="display:none">
-      <div class="ai-card" id="ai-anomalies-card">
-        <div class="ai-card-hdr"><h3>⚠️ Anomaly Alerts</h3></div>
-        <div id="ai-anomalies-body"><div class="ai-loading"><div class="mini-spin"></div>Detecting anomalies…</div></div>
-      </div>
-      <div class="ai-card" id="ai-predictions-card">
-        <div class="ai-card-hdr"><h3>🔮 Smart Predictions</h3></div>
-        <div id="ai-predictions-body"><div class="ai-loading"><div class="mini-spin"></div>Generating predictions…</div></div>
-      </div>
-    </div>
-
-    <!-- Agent Performance (shown only if agent data present) -->
-    <div class="ai-card" id="ai-agents-card" style="display:none">
-      <div class="ai-card-hdr"><h3>👥 Agent Performance Analysis</h3></div>
-      <div id="ai-agents-body"><div class="ai-loading"><div class="mini-spin"></div>Analyzing agent performance…</div></div>
-    </div>
-
-    <!-- Manager Report CTA -->
-    <div class="ai-card" id="ai-report-card" style="display:none">
-      <div class="ai-report-row">
-        <div>
-          <div style="font-weight:700;font-size:.9rem;margin-bottom:5px">📄 Manager Report</div>
-          <div class="ai-report-desc">Generate a professional stakeholder summary with performance metrics and recommendations</div>
+    <div id="dashboard-content" style="display:none">
+      <span class="sec-label">Overview</span>
+      <div id="kpi-container" class="cards-grid"></div>
+      <div id="charts-container"></div>
+      <div id="ai-section" style="display:none">
+        <div class="ai-sec-label">🤖 <span>AI-Powered Insights</span> <span class="ai-badge">POWERED BY CLAUDE</span></div>
+        <div id="ai-locked-state" class="ai-card">
+          <div class="ai-locked">🔒 Enter your Anthropic API key above to unlock AI summaries, anomaly detection, agent analysis, and predictions.</div>
         </div>
-        <button id="ai-report-btn" class="btn btn-primary" style="flex-shrink:0">Generate Report</button>
+        <div id="ai-summary-card" class="ai-card" style="display:none">
+          <div class="ai-card-hdr">
+            <h3>✨ Auto Summary</h3>
+            <button class="btn-sm" id="ai-regen-btn">↺ Regenerate</button>
+          </div>
+          <div id="ai-summary-body"><div class="ai-loading"><div class="mini-spin"></div>Analyzing data…</div></div>
+        </div>
+        <div class="ai-two-col" id="ai-two-col-wrap" style="display:none">
+          <div class="ai-card">
+            <div class="ai-card-hdr"><h3>⚠️ Anomaly Alerts</h3></div>
+            <div id="ai-anomalies-body"><div class="ai-loading"><div class="mini-spin"></div>Detecting anomalies…</div></div>
+          </div>
+          <div class="ai-card">
+            <div class="ai-card-hdr"><h3>🔮 Smart Predictions</h3></div>
+            <div id="ai-predictions-body"><div class="ai-loading"><div class="mini-spin"></div>Generating predictions…</div></div>
+          </div>
+        </div>
+        <div class="ai-card" id="ai-agents-card" style="display:none">
+          <div class="ai-card-hdr"><h3>👥 Agent / Person Analysis</h3></div>
+          <div id="ai-agents-body"><div class="ai-loading"><div class="mini-spin"></div>Analyzing performance…</div></div>
+        </div>
+        <div class="ai-card" id="ai-report-card" style="display:none">
+          <div class="ai-report-row">
+            <div>
+              <div style="font-weight:700;font-size:.9rem;margin-bottom:5px">📄 Manager Report</div>
+              <div class="ai-report-desc">Generate a professional stakeholder summary with key metrics and recommendations</div>
+            </div>
+            <button id="ai-report-btn" class="btn btn-primary" style="flex-shrink:0">Generate Report</button>
+          </div>
+        </div>
       </div>
+      <div id="table-container" class="table-box"></div>
     </div>
   </div>
-
-  <div class="table-box">
-    <h3>🗂 10 Most Recent Tickets</h3>
-    <div class="tbl-scroll"><table><thead id="tbl-head"></thead><tbody id="tbl-body"></tbody></table></div>
-  </div>
-  </div><!-- /dashboard-content -->
-</div><!-- /printable -->
-
-<div id="toasts"></div>
+</div>
 
 <!-- Manager Report Modal -->
 <div id="report-modal-wrap">
@@ -542,195 +427,39 @@ tbody td{padding:10px 14px;white-space:nowrap}
   </div>
 </div>
 
+<div id="toasts"></div>
+
 <script>
 // ─────────────────────────────────────────────────────────
-// DEMO DATA (50 tickets)
+// CONSTANTS
 // ─────────────────────────────────────────────────────────
-const DEMO_RAW = [
-  ['TKT-001','2026-03-30','Software','High','Resolved',4.2],
-  ['TKT-002','2026-03-30','Network','Medium','Resolved',6.8],
-  ['TKT-003','2026-03-31','Hardware','Low','Resolved',2.5],
-  ['TKT-004','2026-03-31','Access','High','Open',0],
-  ['TKT-005','2026-04-01','Software','Medium','Pending',0],
-  ['TKT-006','2026-04-01','Network','High','Resolved',1.9],
-  ['TKT-007','2026-04-02','Software','Low','Resolved',8.1],
-  ['TKT-008','2026-04-02','Hardware','Medium','Open',0],
-  ['TKT-009','2026-04-03','Access','Low','Resolved',3.3],
-  ['TKT-010','2026-04-03','Network','High','Resolved',2.0],
-  ['TKT-011','2026-04-04','Software','Medium','Resolved',5.5],
-  ['TKT-012','2026-04-04','Hardware','High','Open',0],
-  ['TKT-013','2026-04-05','Network','Low','Resolved',7.2],
-  ['TKT-014','2026-04-06','Access','Medium','Pending',0],
-  ['TKT-015','2026-04-06','Software','High','Resolved',3.1],
-  ['TKT-016','2026-04-07','Network','Medium','Resolved',9.4],
-  ['TKT-017','2026-04-07','Hardware','Low','Resolved',1.8],
-  ['TKT-018','2026-04-08','Software','High','Open',0],
-  ['TKT-019','2026-04-08','Access','Low','Resolved',4.6],
-  ['TKT-020','2026-04-09','Network','Medium','Resolved',6.0],
-  ['TKT-021','2026-04-09','Software','Medium','Pending',0],
-  ['TKT-022','2026-04-10','Hardware','High','Resolved',2.7],
-  ['TKT-023','2026-04-10','Network','Low','Resolved',5.9],
-  ['TKT-024','2026-04-11','Access','High','Open',0],
-  ['TKT-025','2026-04-11','Software','Medium','Resolved',3.8],
-  ['TKT-026','2026-04-12','Network','Low','Resolved',8.3],
-  ['TKT-027','2026-04-13','Hardware','Medium','Resolved',4.0],
-  ['TKT-028','2026-04-13','Software','High','Resolved',1.5],
-  ['TKT-029','2026-04-14','Access','Medium','Pending',0],
-  ['TKT-030','2026-04-14','Network','High','Open',0],
-  ['TKT-031','2026-04-15','Software','Low','Resolved',6.4],
-  ['TKT-032','2026-04-15','Hardware','High','Resolved',3.3],
-  ['TKT-033','2026-04-16','Network','Medium','Resolved',7.7],
-  ['TKT-034','2026-04-17','Access','Low','Open',0],
-  ['TKT-035','2026-04-17','Software','High','Resolved',2.2],
-  ['TKT-036','2026-04-18','Network','Medium','Resolved',4.9],
-  ['TKT-037','2026-04-19','Hardware','Low','Resolved',1.1],
-  ['TKT-038','2026-04-19','Software','High','Pending',0],
-  ['TKT-039','2026-04-20','Access','Medium','Resolved',5.0],
-  ['TKT-040','2026-04-20','Network','Low','Resolved',8.8],
-  ['TKT-041','2026-04-21','Software','High','Open',0],
-  ['TKT-042','2026-04-22','Hardware','Medium','Resolved',3.6],
-  ['TKT-043','2026-04-23','Network','High','Resolved',2.4],
-  ['TKT-044','2026-04-23','Access','Low','Pending',0],
-  ['TKT-045','2026-04-24','Software','Medium','Resolved',6.1],
-  ['TKT-046','2026-04-25','Hardware','High','Open',0],
-  ['TKT-047','2026-04-25','Network','Medium','Resolved',4.3],
-  ['TKT-048','2026-04-26','Software','Low','Resolved',7.5],
-  ['TKT-049','2026-04-27','Access','High','Open',0],
-  ['TKT-050','2026-04-28','Network','Medium','Pending',0],
+const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const PALETTE = [
+  'rgba(99,102,241,.75)','rgba(6,182,212,.75)','rgba(16,185,129,.75)',
+  'rgba(245,158,11,.75)','rgba(139,92,246,.75)','rgba(239,68,68,.75)',
+  'rgba(249,115,22,.75)','rgba(236,72,153,.75)','rgba(20,184,166,.75)',
+  'rgba(251,191,36,.75)','rgba(34,211,238,.75)','rgba(167,139,250,.75)',
+];
+const BORDERS = [
+  '#6366f1','#06b6d4','#10b981','#f59e0b','#8b5cf6','#ef4444',
+  '#f97316','#ec4899','#14b8a6','#fbbf24','#22d3ee','#a78bfa',
 ];
 
-const DEMO_TICKETS = DEMO_RAW.map(r => ({
-  ticket_id: r[0], date: r[1], category: r[2],
-  priority: r[3], status: r[4],
-  resolution_time_hours: r[5] || null,
-  _date: new Date(r[1]),
-}));
-
-// ─────────────────────────────────────────────────────────
-// FIELD DEFINITIONS
-// ─────────────────────────────────────────────────────────
-const FIELDS = [
-  { key:'ticket_id', label:'Ticket ID', icon:'🏷️', required:false,
-    aliases:['id','ticket','ticketid','ticket_id','ticketnumber','ticket_number','ticketno','ticket_no',
-             'ticketnum','ref','refno','referencenumber','reference','number','num','no','nr',
-             'issueid','issue_id','caseid','case_id','incidentid','incident_id','requestid','request_id',
-             'sr','servicerequest','casenumber','incidentnumber','requestnumber','callid','call_id'] },
-  { key:'date', label:'Date / Created', icon:'📅', required:true,
-    aliases:['date','created','createdat','created_at','createdon','created_on','opendate','open_date',
-             'opened','openedat','opened_at','submittedat','submitted_at','submitted','reportedat',
-             'reported_at','reportdate','report_date','logdate','log_date','logged','loggedat',
-             'raised','raisedat','raised_at','timestamp','datetime','entrydate','entry_date',
-             'ticketdate','ticket_date','incidentdate','incident_date','requestdate','request_date',
-             'startdate','start_date','calldate','call_date','creationdate','creation_date'] },
-  { key:'category', label:'Category / Type', icon:'🗂️', required:false,
-    aliases:['category','cat','type','issuetype','issue_type','problemtype','problem_type',
-             'department','dept','team','group','area','queue','classification','class',
-             'service','servicetype','service_type','requesttype','request_type',
-             'incidenttype','incident_type','supporttype','support_type','calltype','call_type',
-             'topic','subject','component','module','domain','division','workgroup'] },
-  { key:'priority', label:'Priority', icon:'⚡', required:false,
-    aliases:['priority','pri','urgency','severity','importance','level','criticality',
-             'impact','sla','prioritylevel','priority_level','tier','rank','grade',
-             'escalation','escalationlevel','escalation_level','priorityrating'] },
-  { key:'status', label:'Status', icon:'🔵', required:true,
-    aliases:['status','state','ticketstatus','ticket_status','resolutionstatus','resolution_status',
-             'currentstatus','current_status','workflowstate','workflow_state','lifecycle',
-             'stage','disposition','ticketstate','casestatus','case_status','incidentstatus',
-             'incident_status','requeststatus','request_status','resolution','condition','phase'] },
-  { key:'resolution_time_hours', label:'Resolution Time (hrs)', icon:'⏱️', required:false,
-    aliases:['resolution_time_hours','resolutionhours','resolution_hours','resolutiontime',
-             'resolution_time','resolvetime','resolve_time','timetoresolve','time_to_resolve',
-             'hours','duration','ttr','mttr','resolvehours','resolve_hrs','resolution_hrs',
-             'fixtime','fix_time','handlingtime','handling_time','responsetime','response_time',
-             'closetime','close_time','timetaken','time_taken','hourstoresolve','timetoclose',
-             'time_to_close','workedhours','worked_hours','actualhours','actual_hours'] },
-];
-
-// ─────────────────────────────────────────────────────────
-// DYNAMIC / EXTENDED FIELD DEFINITIONS
-// ─────────────────────────────────────────────────────────
-const DYNAMIC_FIELDS = [
-  { key:'agent', label:'Agent / Owner', icon:'👤',
-    aliases:['agent','agentname','agent_name','owner','assignee','assignedto','assigned_to',
-             'handledby','handled_by','technician','tech','rep','representative','analyst',
-             'resolver','engineer','specialist','supportrep','support_rep','assignedagent',
-             'closedby','closed_by','resolvedby','resolved_by','attendedby','attended_by',
-             'staffname','staff_name','employeename','employee','workerby','worked_by'] },
-  { key:'department', label:'Department', icon:'🏢',
-    aliases:['department','dept','division','businessunit','business_unit','unit','section',
-             'branch','costcenter','cost_center','subdept','sub_dept','org','organization',
-             'region','location','site','office','country','territory','zone'] },
-  { key:'satisfaction_score', label:'CSAT Score', icon:'⭐',
-    aliases:['csat','nps','satisfaction','satisfactionscore','satisfaction_score',
-             'rating','score','stars','feedback','customerrating','customer_rating',
-             'surveyrating','survey_rating','satisfactionrating','customerscore',
-             'customer_score','reviewscore','review_score','servicerating','qualityscore'] },
-];
+const TYPE_ICONS = { date:'📅', status:'🔵', agent:'👤', priority:'⚡', category:'📊', number:'🔢', id:'🔑', text:'📝' };
+const TYPE_LABELS = { date:'Date', status:'Status', agent:'Name / Agent', priority:'Priority / Level', category:'Category', number:'Number', id:'ID', text:'Text' };
 
 // ─────────────────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────────────────
-let currentTickets = [];
-let currentHeaders = [];
-let isDemo = true;
+let rawRows = [];
+let rawHeaders = [];
+let schema = null;
+let filteredRows = [];
 let apiKey = '';
-let pendingCSVRows = [];
-let pendingCSVHeaders = [];
-let pendingFilename = '';
-let currentMapping = {};
-let barChartField = null;
+let currentFilename = '';
+let _aiStats = null;
 const charts = {};
-
-// ─────────────────────────────────────────────────────────
-// UTILITIES
-// ─────────────────────────────────────────────────────────
-function norm(s){ return String(s).toLowerCase().replace(/[\s_\-\.]/g,''); }
-function pad(n){ return String(n).padStart(2,'0'); }
-function toDateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-
-function parseDate(s){
-  if(!s) return null;
-  const d = new Date(s);
-  if(!isNaN(d)) return d;
-  // Try DD/MM/YYYY
-  const m = String(s).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(m) return new Date(`${m[3]}-${pad(m[2])}-${pad(m[1])}`);
-  return null;
-}
-
-function parseNum(s){
-  if(s === null || s === undefined || s === '') return null;
-  const n = parseFloat(String(s).replace(/[^\d.]/g,''));
-  return isNaN(n) ? null : n;
-}
-
-function toast(msg, type='info'){
-  const el = document.createElement('div');
-  el.className = `toast toast-${type}`;
-  el.textContent = msg;
-  document.getElementById('toasts').appendChild(el);
-  requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
-  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3500);
-}
-
-function showSpinner(msg='Processing…'){
-  document.getElementById('spin-msg').textContent = msg;
-  document.getElementById('spinner').classList.add('on');
-}
-function hideSpinner(){ document.getElementById('spinner').classList.remove('on'); }
-
-function makeChart(id, config){
-  if(charts[id]) charts[id].destroy();
-  charts[id] = new Chart(document.getElementById(id), config);
-}
-
-function showPlaceholder(id, show){
-  const ph = document.getElementById('ph-'+id);
-  const cv = document.getElementById(id+'Chart') || document.getElementById(id);
-  if(!ph) return;
-  ph.style.display = show ? 'flex' : 'none';
-  if(cv) cv.style.display = show ? 'none' : 'block';
-}
 
 // ─────────────────────────────────────────────────────────
 // CHART DEFAULTS
@@ -738,924 +467,711 @@ function showPlaceholder(id, show){
 Chart.defaults.color = '#94a3b8';
 Chart.defaults.borderColor = '#2d3748';
 Chart.defaults.font.family = "'Segoe UI',system-ui,sans-serif";
-
-const TT = {
-  backgroundColor:'#1f2937', borderColor:'#374151', borderWidth:1,
-  titleColor:'#f1f5f9', bodyColor:'#94a3b8', padding:12, cornerRadius:8,
-};
+const TT = { backgroundColor:'#1f2937', borderColor:'#374151', borderWidth:1, titleColor:'#f1f5f9', bodyColor:'#94a3b8', padding:12, cornerRadius:8 };
 
 // ─────────────────────────────────────────────────────────
-// SMART AUTO-DETECT — multi-strategy, no manual mapping
+// UTILITIES
 // ─────────────────────────────────────────────────────────
+function pad(n){ return String(n).padStart(2,'0'); }
+function toDateKey(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function sanitizeId(s){ return s.replace(/\W+/g,'_').toLowerCase(); }
 
-// Bigram (Dice) similarity between two normalised strings
-function bigramSim(a, b){
-  if(a === b) return 1;
-  if(!a || !b || a.length < 2 || b.length < 2) return 0;
-  const bg = s => { const r=new Set(); for(let i=0;i<s.length-1;i++) r.add(s.slice(i,i+2)); return r; };
-  const sa=bg(a), sb=bg(b);
-  const inter = [...sa].filter(x=>sb.has(x)).length;
-  return (2*inter)/(sa.size+sb.size);
-}
-
-// Guess a field key by examining sample cell values
-function inferFieldFromValues(values){
-  const sample = values.filter(v => v && String(v).trim()).slice(0,30).map(v => String(v).trim());
-  if(sample.length < 3) return null;
-
-  // Date: ISO / MM-DD-YYYY / named-month patterns, or parseable Date objects
-  const dateLike = sample.filter(v =>
-    /^\d{4}-\d{2}-\d{2}/.test(v) ||
-    /^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(v) ||
-    /^[A-Za-z]+ \d{1,2},? \d{4}/.test(v) ||
-    (!isNaN(new Date(v)) && new Date(v).getFullYear() > 1990)
-  );
-  if(dateLike.length / sample.length > 0.6) return 'date';
-
-  // Status: well-known lifecycle words
-  const statusKw = new Set(['open','closed','resolved','pending','inprogress','in progress','onhold',
-    'on hold','cancelled','canceled','done','complete','completed','new','active','assigned',
-    'unassigned','escalated','reopened','wip','waiting','rejected','approved']);
-  const statusHits = sample.filter(v => statusKw.has(v.toLowerCase().replace(/\s+/g,'')) || statusKw.has(v.toLowerCase()));
-  if(statusHits.length / sample.length > 0.4) return 'status';
-
-  // Priority: known tiers or P1-P4 codes
-  const priKw = new Set(['low','medium','high','critical','urgent','normal','p1','p2','p3','p4',
-    '1','2','3','4','minor','major','blocker','trivial']);
-  const priHits = sample.filter(v => priKw.has(v.toLowerCase()));
-  if(priHits.length / sample.length > 0.4) return 'priority';
-
-  // Ticket ID: letters + hyphen + numbers, or long numeric IDs
-  const idHits = sample.filter(v => /^[A-Z]{2,8}[-#]\d+/i.test(v) || /^#?\d{4,}$/.test(v));
-  if(idHits.length / sample.length > 0.5) return 'ticket_id';
-
-  // Resolution time: mostly numeric, plausible hour values (0 – 9999)
-  const nums = sample.map(v => parseFloat(v)).filter(n => !isNaN(n) && n >= 0 && n < 10000);
-  if(nums.length / sample.length > 0.7) return 'resolution_time_hours';
-
+function parseDate(s){
+  if(!s) return null;
+  const str = String(s).trim();
+  // D/M/YYYY H:MM:SS am/pm (Indian/European with optional seconds + am/pm)
+  const m1 = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(am|pm)?$/i);
+  if(m1){
+    const [,d,mo,y,h,min,,ampm] = m1;
+    let hr = parseInt(h);
+    if(ampm){ if(ampm.toLowerCase()==='pm'&&hr!==12) hr+=12; else if(ampm.toLowerCase()==='am'&&hr===12) hr=0; }
+    return new Date(parseInt(y),parseInt(mo)-1,parseInt(d),hr,parseInt(min),0);
+  }
+  // D/M/YYYY
+  const m2 = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m2) return new Date(parseInt(m2[3]),parseInt(m2[2])-1,parseInt(m2[1]));
+  // YYYY-MM-DD or ISO
+  const d = new Date(str);
+  if(!isNaN(d) && d.getFullYear()>1990 && d.getFullYear()<2100) return d;
   return null;
 }
 
-// Score how well a CSV header (+ its values) matches a field definition
-function scoreHeader(headerRaw, field, values){
-  const h = norm(headerRaw);
-  const targets = [norm(field.key), ...field.aliases.map(norm)];
-  let best = 0;
+function formatDate(d){ if(!d||isNaN(d)) return '—'; return `${pad(d.getDate())} ${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`; }
 
-  for(const t of targets){
-    if(h === t) return 0.99;                            // exact normalised match
-    if(h.includes(t) || t.includes(h)){
-      const overlap = Math.min(h.length,t.length) / Math.max(h.length,t.length);
-      best = Math.max(best, 0.75 + 0.2*overlap);       // containment
-    }
-    const sim = bigramSim(h,t);
-    if(sim >= 0.75) best = Math.max(best, 0.5+sim*0.4); // fuzzy bigrams
+function cleanAgentName(s){
+  if(!s) return '';
+  return s.replace(/<[^>]*>.*$/,'').replace(/\s*\([^)]*\)\s*$/,'').trim();
+}
+
+function parseNum(s){
+  if(s===null||s===undefined||s==='') return null;
+  const n = parseFloat(String(s).replace(/[^\d.\-]/g,''));
+  return isNaN(n) ? null : n;
+}
+
+function statusPill(val){
+  if(!val||String(val).trim()==='') return '<span class="pill p-other">—</span>';
+  const v = String(val).toLowerCase().trim();
+  let cls = 'p-other';
+  if(/open|active|new|unassign|reopen/.test(v)) cls='p-open';
+  else if(/resolv|clos|done|complet|finish|fix/.test(v)) cls='p-resolved';
+  else if(/pend|wait|hold|wip|progress|review|in-prog/.test(v)) cls='p-pending';
+  return `<span class="pill ${cls}">${val}</span>`;
+}
+
+function priorityPill(val){
+  if(!val||String(val).trim()==='') return '<span class="pill p-other">—</span>';
+  const v = String(val).toLowerCase().trim();
+  let cls = 'p-other';
+  if(/crit|blocker|p1/.test(v)) cls='p-critical';
+  else if(/high|major|urgent|p2/.test(v)) cls='p-high';
+  else if(/med|normal|p3/.test(v)) cls='p-medium';
+  else if(/low|minor|p4/.test(v)) cls='p-low';
+  return `<span class="pill ${cls}">${val}</span>`;
+}
+
+function toast(msg,type='info'){
+  const el=document.createElement('div');
+  el.className=`toast toast-${type}`;
+  el.textContent=msg;
+  document.getElementById('toasts').appendChild(el);
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=>el.classList.add('show')); });
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3500);
+}
+
+function showSpinner(msg='Processing…'){ document.getElementById('spin-msg').textContent=msg; document.getElementById('spinner').classList.add('on'); }
+function hideSpinner(){ document.getElementById('spinner').classList.remove('on'); }
+
+// ─────────────────────────────────────────────────────────
+// COLUMN DETECTION
+// ─────────────────────────────────────────────────────────
+function analyzeColumn(header, rows){
+  const values = rows.map(r => r[header]);
+  const nonEmpty = values.filter(v => v!==null && v!==undefined && String(v).trim()!=='');
+  const strVals = nonEmpty.map(v => String(v).trim());
+  const sample = strVals.slice(0,50);
+  const uniqueSet = new Set(strVals.map(v => v.toLowerCase()));
+  const uniqueCount = uniqueSet.size;
+  const h = header.toLowerCase().replace(/[\s_\-\.]+/g,'');
+  const n = nonEmpty.length;
+
+  // ── DATE ──
+  const dateHdr = /date|time|created|closed|opened|resolved|updated|modified|start|end|timestamp|at$|on$/i.test(h);
+  const dateParsed = sample.slice(0,20).filter(v => { const d=parseDate(v); return d&&!isNaN(d); }).length;
+  const datePct = dateParsed / Math.max(sample.slice(0,20).length,1);
+  if(datePct>0.65||(dateHdr&&dateParsed>=2)){
+    return {header,type:'date',uniqueCount,sample:sample.slice(0,4)};
   }
 
-  // Word-level: individual words in header checked against every target
-  const words = headerRaw.toLowerCase().split(/[\s_\-\/\.]+/).map(norm).filter(w=>w.length>1);
-  for(const w of words){
-    for(const t of targets){
-      if(t === w) best = Math.max(best, 0.72);
-      else if(t.includes(w) && w.length >= 3) best = Math.max(best, 0.62);
-    }
+  // ── ID ──
+  const idHdr = /^id$|^ticketid|^orderid|^employeeid|^recordid|^caseid|ticketno|orderno|^refno|^no$|^num$|^sr$|^ref$/.test(h)
+    || header.trim().toLowerCase()==='id';
+  const idLike = sample.slice(0,20).filter(v=>/^[A-Za-z]{1,6}[-#\/]\d+$/.test(v)||/^#?\d{4,8}$/.test(v)).length;
+  const isHighUnique = uniqueCount/Math.max(n,1)>0.85;
+  if(idHdr||(idLike/Math.max(sample.slice(0,20).length,1)>0.5&&isHighUnique)){
+    return {header,type:'id',uniqueCount,sample:sample.slice(0,4)};
   }
 
-  // Value-based inference: only used when header score is weak
-  if(best < 0.5 && values && values.length){
-    if(inferFieldFromValues(values) === field.key) best = Math.max(best, 0.62);
+  // ── AGENT / NAME ──
+  const agentHdr = /assign|agent|owner|handl|by$|rep$|analyst|engineer|staff|employee$|person$|user$/i.test(h)
+    || /^name$/i.test(header.trim());
+  const hasEmail = sample.slice(0,10).some(v=>/<[^>]+@[^>]+>/.test(v)||/\s+<.+>$/.test(v));
+  if(agentHdr||hasEmail){ return {header,type:'agent',uniqueCount,sample:sample.slice(0,4)}; }
+
+  // ── NUMBER ──
+  const numSample = sample.slice(0,30);
+  const numParsed = numSample.filter(v=>!isNaN(parseFloat(v.replace(/[,$%\s]/g,'')))).length;
+  if(numParsed/Math.max(numSample.length,1)>0.8&&uniqueCount>3&&!isHighUnique){
+    return {header,type:'number',uniqueCount,sample:sample.slice(0,4)};
   }
 
-  return best;
-}
-
-// Main entry point — returns { field_key: "CSV column" } for ALL known fields
-function smartAutoDetect(headers, rows){
-  const ALL_FIELDS = [...FIELDS, ...DYNAMIC_FIELDS]; // core 6 + agent/dept/csat
-
-  // Build value samples (up to 30 rows) per column
-  const samples = {};
-  headers.forEach(h => {
-    samples[h] = rows.slice(0,30)
-      .map(r => String(r[h]??''))
-      .filter(v => v && v !== 'undefined' && v !== 'null');
-  });
-
-  // Build full score matrix
-  const scoreMatrix = {};
-  ALL_FIELDS.forEach(f => {
-    scoreMatrix[f.key] = {};
-    headers.forEach(h => {
-      scoreMatrix[f.key][h] = scoreHeader(h, f, samples[h]);
-    });
-  });
-
-  // Greedy assignment: highest-scoring field gets first pick, no column reused
-  const mapping = {};
-  ALL_FIELDS.forEach(f => { mapping[f.key] = null; });
-  const used = new Set();
-
-  const sorted = [...ALL_FIELDS].sort((a,b) => {
-    const bA = Math.max(0,...Object.values(scoreMatrix[a.key]));
-    const bB = Math.max(0,...Object.values(scoreMatrix[b.key]));
-    return bB - bA;
-  });
-
-  sorted.forEach(f => {
-    let bestH = null, bestScore = 0.32; // minimum confidence threshold
-    headers.forEach(h => {
-      if(!used.has(h) && scoreMatrix[f.key][h] > bestScore){
-        bestScore = scoreMatrix[f.key][h];
-        bestH = h;
-      }
-    });
-    if(bestH){ mapping[f.key] = bestH; used.add(bestH); }
-  });
-
-  return mapping;
-}
-
-// Legacy alias kept for Re-map Columns modal pre-fill
-function autoDetect(headers){ return smartAutoDetect(headers, []); }
-
-// ─────────────────────────────────────────────────────────
-// MAPPER MODAL
-// ─────────────────────────────────────────────────────────
-function openMapper(headers, rows, filename, autoMapping){
-  pendingCSVHeaders = headers;
-  pendingCSVRows = rows;
-  pendingFilename = filename;
-
-  document.getElementById('mapper-sub').textContent =
-    `${filename} · ${rows.length} rows detected`;
-
-  const tbody = document.getElementById('mapper-rows');
-  tbody.innerHTML = '';
-  FIELDS.forEach(f => {
-    const sel = autoMapping[f.key] || '';
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><div class="field-meta">
-        <span class="field-icon">${f.icon}</span>
-        <span class="field-name">${f.label}</span>
-        <span class="${f.required ? 'badge-req' : 'badge-opt'}">${f.required ? 'Required' : 'Optional'}</span>
-      </div></td>
-      <td><select class="col-select" data-field="${f.key}">
-        <option value="">— Skip this field —</option>
-        ${headers.map(h => `<option value="${h}"${h===sel?' selected':''}>${h}</option>`).join('')}
-      </select></td>
-      <td><div class="map-dot ${sel ? 'ok' : f.required ? 'err' : 'skip'}" id="dot-${f.key}">
-        ${sel ? '✓' : f.required ? '✗' : '○'}
-      </div></td>`;
-    tbody.appendChild(tr);
-    tr.querySelector('select').addEventListener('change', onMapChange);
-  });
-
-  updateApplyBtn();
-  document.getElementById('mapper-wrap').classList.add('on');
-}
-
-function closeMapper(){
-  document.getElementById('mapper-wrap').classList.remove('on');
-}
-
-function onMapChange(e){
-  const field = e.target.dataset.field;
-  const val = e.target.value;
-  const f = FIELDS.find(x => x.key === field);
-  const dot = document.getElementById('dot-'+field);
-  if(val){ dot.className='map-dot ok'; dot.textContent='✓'; }
-  else if(f.required){ dot.className='map-dot err'; dot.textContent='✗'; }
-  else { dot.className='map-dot skip'; dot.textContent='○'; }
-  updateApplyBtn();
-}
-
-function updateApplyBtn(){
-  const selects = document.querySelectorAll('.col-select');
-  let ok = true;
-  selects.forEach(sel => {
-    const f = FIELDS.find(x => x.key === sel.dataset.field);
-    if(f && f.required && !sel.value) ok = false;
-  });
-  const btn = document.getElementById('mapper-apply');
-  btn.disabled = !ok;
-  document.getElementById('mapper-hint').textContent = ok
-    ? `${pendingCSVRows.length} rows ready to load`
-    : 'Fill required fields (marked Required) to continue';
-}
-
-function applyMapper(){
-  const mapping = {};
-  document.querySelectorAll('.col-select').forEach(sel => {
-    mapping[sel.dataset.field] = sel.value || null;
-  });
-  currentMapping = mapping;
-  closeMapper();
-  const tickets = processRows(pendingCSVRows, mapping);
-  if(!tickets.length){ toast('No valid rows found — check your date column','error'); return; }
-  loadDashboard(tickets, false, pendingFilename, pendingCSVRows.length, pendingCSVHeaders);
-}
-
-// ─────────────────────────────────────────────────────────
-// PROCESS CSV ROWS → TICKET OBJECTS
-// ─────────────────────────────────────────────────────────
-function processRows(rows, mapping){
-  return rows.map((row, i) => {
-    const get = key => mapping[key] ? (row[mapping[key]] ?? '') : '';
-    const dateStr = get('date');
-    const _date = parseDate(dateStr);
-    return {
-      ticket_id: get('ticket_id') || `ROW-${i+1}`,
-      date: dateStr,
-      category: get('category') || null,
-      priority: get('priority') || null,
-      status: get('status') || null,
-      resolution_time_hours: parseNum(get('resolution_time_hours')),
-      agent: get('agent') || null,
-      department: get('department') || null,
-      satisfaction_score: parseNum(get('satisfaction_score')),
-      _date,
-      _row: row,
-    };
-  }).filter(t => !mapping.date || (t._date && !isNaN(t._date)));
-}
-
-// ─────────────────────────────────────────────────────────
-// LOAD DASHBOARD
-// ─────────────────────────────────────────────────────────
-function loadDashboard(tickets, demo, filename, rawRows, headers){
-  currentTickets = tickets;
-  currentHeaders = demo ? [] : (headers || []);
-  isDemo = demo;
-
-  // Banners
-  document.getElementById('demo-notice').style.display = demo ? '' : 'none';
-  const srcBar = document.getElementById('source-bar');
-  srcBar.style.display = demo ? 'none' : '';
-  if(!demo){
-    document.getElementById('src-name').textContent = filename;
-    document.getElementById('src-rows').textContent = rawRows;
+  // ── PRIORITY ──
+  const priHdr = /prior|sever|urgency|impact|criticality|difficul/i.test(h);
+  const priKw = new Set(['low','medium','high','critical','urgent','normal','p1','p2','p3','p4','minor','major','blocker','trivial','severe']);
+  const priHits = sample.filter(v=>priKw.has(v.toLowerCase())).length;
+  if(priHdr||(priHits/Math.max(sample.length,1)>0.5&&uniqueCount<=6)){
+    return {header,type:'priority',uniqueCount,sample:sample.slice(0,4)};
   }
 
-  // Upload zone: hide after real file loaded
-  document.getElementById('upload-wrap').style.display = demo ? '' : 'none';
+  // ── STATUS ──
+  const statHdr = /status|state|stage|phase|progress|condition|lifecycle/i.test(h);
+  const statKw = new Set(['open','closed','resolved','pending','in progress','on hold','cancelled','canceled','done','complete','completed','new','active','assigned','unassigned','escalated','reopened','wip','waiting','rejected','approved','inactive','not started','paused']);
+  const statHits = sample.filter(v=>statKw.has(v.toLowerCase().trim())).length;
+  if(statHdr||(statHits/Math.max(sample.length,1)>0.35&&uniqueCount<=12)){
+    return {header,type:'status',uniqueCount,sample:sample.slice(0,4)};
+  }
 
-  // Enable PDF button
+  // ── CATEGORY ──
+  const catHdr = /type|categ|app|module|group|team|dept|department|region|area|zone|country|product|service|class|division|location|site|complex/i.test(h);
+  if(catHdr||(uniqueCount>=2&&uniqueCount<=20&&n>=5)){
+    return {header,type:'category',uniqueCount,sample:sample.slice(0,4)};
+  }
+
+  return {header,type:'text',uniqueCount,sample:sample.slice(0,4)};
+}
+
+function detectSchema(headers, rows){
+  const cols = headers.map(h => analyzeColumn(h, rows));
+  const byType = {};
+  cols.forEach(c => { if(!byType[c.type]) byType[c.type]=[]; byType[c.type].push(c); });
+
+  // Date columns
+  const dateCols = byType['date']||[];
+  const prefCreated = dateCols.find(c=>/created|start|open|submit|raised|logged|report/i.test(c.header));
+  const prefClosed  = dateCols.find(c=>/closed|close|end|resolv|complet|finish/i.test(c.header));
+  const primaryDate   = (prefCreated||dateCols[0])?.header||null;
+  const secondaryDate = (prefClosed||dateCols.find(c=>c.header!==primaryDate))?.header||null;
+
+  // Status
+  const statCols = byType['status']||[];
+  const statusCol = (statCols.find(c=>/^status$|^state$/i.test(c.header.trim()))||statCols.sort((a,b)=>a.uniqueCount-b.uniqueCount)[0])?.header||null;
+
+  // Agent
+  const agentCols = byType['agent']||[];
+  const agentCol = (agentCols.find(c=>/assign|agent/i.test(c.header))||agentCols[0])?.header||null;
+
+  // Priority
+  const priCols = byType['priority']||[];
+  const priorityCol = (priCols.find(c=>/prior|sever/i.test(c.header))||priCols[0])?.header||null;
+
+  // ID
+  const idCol = (byType['id']||[])[0]?.header||null;
+
+  // Categorical: category-typed + extra status/priority/agent cols not already assigned
+  const assigned = new Set([idCol,primaryDate,secondaryDate,statusCol,agentCol,priorityCol].filter(Boolean));
+  const categoricalCols = [
+    ...(byType['category']||[]),
+    ...(byType['status']||[]).filter(c=>c.header!==statusCol),
+    ...(byType['priority']||[]).filter(c=>c.header!==priorityCol),
+    ...(byType['agent']||[]).filter(c=>c.header!==agentCol),
+  ].filter(c=>!assigned.has(c.header)).map(c=>c.header);
+
+  const numberCols = (byType['number']||[]).map(c=>c.header);
+  const textCols   = (byType['text']||[]).map(c=>c.header);
+
+  return { cols, idCol, primaryDate, secondaryDate, allDates:dateCols.map(c=>c.header), statusCol, agentCol, priorityCol, categoricalCols, numberCols, textCols };
+}
+
+// ─────────────────────────────────────────────────────────
+// FILE HANDLING
+// ─────────────────────────────────────────────────────────
+function openFilePicker(){
+  const inp = document.getElementById('file-input');
+  inp.value='';
+  inp.click();
+}
+
+function processAndLoad(headers, rows, filename){
+  if(!rows.length){ toast('File appears to be empty','error'); return; }
+  if(!headers.length){ toast('Could not detect column headers','error'); return; }
+  rawRows = rows;
+  rawHeaders = headers;
+  currentFilename = filename;
+  const det = detectSchema(headers, rows);
+  showPreview(headers, rows, det, filename);
+}
+
+function parseCSVFile(file){
+  showSpinner('Parsing CSV…');
+  const reader = new FileReader();
+  reader.onload = e => {
+    hideSpinner();
+    const result = Papa.parse(e.target.result,{header:true,skipEmptyLines:true,dynamicTyping:false});
+    if(!result.data.length){ toast('CSV appears to be empty','error'); return; }
+    processAndLoad(result.meta.fields||[], result.data, file.name);
+  };
+  reader.onerror=()=>{ hideSpinner(); toast('Could not read file','error'); };
+  reader.readAsText(file);
+}
+
+function parseExcelFile(file){
+  showSpinner('Parsing Excel…');
+  const reader = new FileReader();
+  reader.onload = e => {
+    hideSpinner();
+    try{
+      const wb = XLSX.read(e.target.result,{type:'array',raw:false});
+      if(!wb.SheetNames.length){ toast('No sheets found','error'); return; }
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rawData = XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
+      if(!rawData.length){ toast('Sheet appears empty','error'); return; }
+      const hdrs = Object.keys(rawData[0]);
+      const rows = rawData.map(row=>{ const o={}; hdrs.forEach(h=>{ o[h]=row[h]!==undefined?String(row[h]):''; }); return o; });
+      processAndLoad(hdrs, rows, file.name);
+    }catch(err){ toast('Could not read Excel: '+err.message,'error'); }
+  };
+  reader.onerror=()=>{ hideSpinner(); toast('Could not read file','error'); };
+  reader.readAsArrayBuffer(file);
+}
+
+function handleFile(file){
+  if(!file) return;
+  const n = file.name.toLowerCase();
+  if(n.endsWith('.csv')) parseCSVFile(file);
+  else if(n.endsWith('.xlsx')||n.endsWith('.xls')) parseExcelFile(file);
+  else toast('Please select a .csv, .xlsx, or .xls file','error');
+}
+
+// ─────────────────────────────────────────────────────────
+// PREVIEW MODAL
+// ─────────────────────────────────────────────────────────
+function showPreview(headers, rows, det, filename){
+  schema = det;
+  document.getElementById('preview-head-title').textContent = `📋 ${headers.length} Columns Detected`;
+  document.getElementById('preview-head-sub').textContent = `${filename} · ${rows.length.toLocaleString()} rows`;
+  document.getElementById('preview-note').textContent = `${rows.length.toLocaleString()} records ready`;
+
+  // Column badges
+  document.getElementById('preview-badges').innerHTML = det.cols.map(c=>`
+    <div class="col-badge type-${c.type}">
+      <span class="cb-icon">${TYPE_ICONS[c.type]}</span>
+      <span>
+        <div class="cb-name">${c.header}</div>
+        <div class="cb-type">${TYPE_LABELS[c.type]}</div>
+      </span>
+    </div>`).join('');
+
+  // Detection summary
+  const items = [];
+  if(det.primaryDate)   items.push({ok:true,  txt:`Primary date column: "${det.primaryDate}"`});
+  if(det.secondaryDate) items.push({ok:true,  txt:`Closed/end date: "${det.secondaryDate}" — resolution time will auto-calculate`});
+  if(det.statusCol)     items.push({ok:true,  txt:`Status column: "${det.statusCol}"`});
+  if(det.agentCol)      items.push({ok:true,  txt:`Agent/person column: "${det.agentCol}"`});
+  if(det.priorityCol)   items.push({ok:true,  txt:`Priority column: "${det.priorityCol}"`});
+  if(det.categoricalCols.length) items.push({ok:true, txt:`${det.categoricalCols.length} categorical column${det.categoricalCols.length>1?'s':''} for charts & filters: ${det.categoricalCols.slice(0,4).map(c=>`"${c}"`).join(', ')}`});
+  if(det.numberCols.length)      items.push({ok:true, txt:`${det.numberCols.length} numeric column${det.numberCols.length>1?'s':''}: ${det.numberCols.map(c=>`"${c}"`).join(', ')}`});
+  if(!det.primaryDate)  items.push({ok:false, txt:'No date column detected — time-series chart unavailable'});
+  if(!det.statusCol)    items.push({ok:false, txt:'No status column detected — status breakdown unavailable'});
+
+  document.getElementById('preview-summary').innerHTML = items.map(i=>`
+    <div class="ps-row"><span class="${i.ok?'ps-ok':'ps-warn'}">${i.ok?'✓':'⚠'}</span>${i.txt}</div>`).join('');
+
+  document.getElementById('preview-modal').classList.add('on');
+}
+
+function closePreview(){ document.getElementById('preview-modal').classList.remove('on'); }
+
+function confirmLoad(){
+  closePreview();
+  buildDashboard(rawRows, schema, currentFilename);
+}
+
+// ─────────────────────────────────────────────────────────
+// BUILD DASHBOARD
+// ─────────────────────────────────────────────────────────
+function buildDashboard(rows, sch, filename){
+  schema = sch;
+  currentFilename = filename;
+
+  document.getElementById('upload-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = '';
+  document.getElementById('source-bar').style.display = '';
+  document.getElementById('src-name').textContent = filename;
+  document.getElementById('src-rows').textContent = rows.length.toLocaleString();
   document.getElementById('btn-pdf').disabled = false;
+  document.getElementById('hdr-sub').textContent = `${rows.length.toLocaleString()} records · ${rawHeaders.length} columns`;
 
-  // Reset filters, repopulate options, then render
-  clearFilterUI();
-  populateFilters(tickets);
-  renderAll(tickets);
+  buildFilters(sch);
+  filteredRows = rows;
+  renderAll(rows);
+  setupAISection(rows);
+  window.scrollTo({top:0});
+}
 
-  if(!demo) toast(`✓ Loaded ${tickets.length} tickets from ${filename}`, 'success');
-
-  // AI section — show only for real CSV uploads
-  const aiSection = document.getElementById('ai-section');
-  if(demo){ aiSection.style.display = 'none'; }
-  else { setupAISection(tickets); }
+function renderAll(rows){
+  const empty = document.getElementById('empty-state');
+  const content = document.getElementById('dashboard-content');
+  if(!rows.length){
+    empty.style.display='flex';
+    content.style.display='none';
+    updateFilterSummary(rows);
+    return;
+  }
+  empty.style.display='none';
+  content.style.display='';
+  buildKPIs(rows, schema);
+  buildCharts(rows, schema);
+  buildTable(rows, schema);
+  updateFilterSummary(rows);
 }
 
 // ─────────────────────────────────────────────────────────
 // KPI CARDS
 // ─────────────────────────────────────────────────────────
-function renderKPIs(tickets){
-  const total = tickets.length;
-  const openT  = tickets.filter(t => /open/i.test(t.status||''));
-  const resolved = tickets.filter(t => /resolved|closed|done/i.test(t.status||''));
-  const withTime = resolved.filter(t => t.resolution_time_hours > 0);
-  const avgHrs = withTime.length
-    ? (withTime.reduce((s,t) => s+t.resolution_time_hours, 0) / withTime.length).toFixed(1)
-    : null;
-  const rate = total ? ((resolved.length / total)*100).toFixed(1) : null;
+function buildKPIs(rows, sch){
+  const kpis = [];
+  const n = rows.length;
 
-  document.getElementById('k-total').textContent = total;
-  document.getElementById('k-total-sub').textContent = 'Total tickets';
-  document.getElementById('k-open').textContent = openT.length;
-  document.getElementById('k-open-sub').textContent = 'Awaiting resolution';
-  document.getElementById('k-avg').textContent = avgHrs !== null ? avgHrs+'h' : 'N/A';
-  document.getElementById('k-avg-sub').textContent = avgHrs !== null ? 'Average per ticket' : 'No resolution data';
-  document.getElementById('k-rate').textContent = rate !== null ? rate+'%' : 'N/A';
-  document.getElementById('k-rate-sub').textContent = rate !== null ? `${resolved.length} of ${total} resolved` : 'No status data';
-}
+  // 1. Total records
+  kpis.push({label:'Total Records', value:n.toLocaleString(), color:'blue', icon:'📄', sub:currentFilename});
 
-// ─────────────────────────────────────────────────────────
-// LINE CHART — volume over time
-// ─────────────────────────────────────────────────────────
-function renderLineChart(tickets){
-  const dated = tickets.filter(t => t._date);
-  if(!dated.length){ showPlaceholder('line',true); return; }
-  showPlaceholder('line',false);
-
-  const byDate = {};
-  dated.forEach(t => {
-    const k = toDateKey(t._date);
-    byDate[k] = (byDate[k]||0) + 1;
-  });
-
-  const sorted = Object.keys(byDate).sort();
-  const maxD = new Date(sorted[sorted.length-1]);
-  const minD = new Date(sorted[0]);
-  const totalDays = Math.ceil((maxD - minD)/86400000) + 1;
-  const showDays = Math.min(totalDays, 90);
-  const startD = new Date(maxD);
-  startD.setDate(startD.getDate() - showDays + 1);
-
-  const labels=[], data=[];
-  for(let i=0; i<showDays; i++){
-    const d = new Date(startD);
-    d.setDate(d.getDate()+i);
-    labels.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
-    data.push(byDate[toDateKey(d)] || 0);
+  // 2. Status-based: open + resolution rate
+  if(sch.statusCol){
+    const cnts = {};
+    rows.forEach(r=>{ const s=String(r[sch.statusCol]||'').trim(); if(s) cnts[s]=(cnts[s]||0)+1; });
+    const openKeys  = Object.keys(cnts).filter(k=>/open|active|new|pend|wip|in.prog|waiting|progress/i.test(k));
+    const openCount = openKeys.reduce((s,k)=>s+cnts[k],0);
+    if(openCount>0) kpis.push({label:'Open / Active', value:openCount.toLocaleString(), color:'red', icon:'🔴', sub:sch.statusCol});
+    const closedKeys  = Object.keys(cnts).filter(k=>/resolv|clos|done|complet|finish/i.test(k));
+    const closedCount = closedKeys.reduce((s,k)=>s+cnts[k],0);
+    if(closedCount>0){
+      const rate = ((closedCount/n)*100).toFixed(1);
+      kpis.push({label:'Resolution Rate', value:`${rate}%`, color:'green', icon:'✅', sub:`${closedCount.toLocaleString()} resolved`});
+    }
   }
 
-  makeChart('lineChart',{
-    type:'line',
-    data:{
-      labels,
-      datasets:[{
-        label:'Tickets',
-        data,
-        borderColor:'#6366f1',
-        backgroundColor:'rgba(99,102,241,.12)',
-        borderWidth:2.5,
-        pointBackgroundColor:'#6366f1',
-        pointBorderColor:'#0a0e1a',
-        pointBorderWidth:2,
-        pointRadius:3,
-        pointHoverRadius:5,
-        fill:true,
-        tension:0.4,
-      }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} ticket${c.parsed.y!==1?'s':''}`}}},
-      scales:{
-        x:{grid:{display:false},ticks:{maxTicksLimit:12,maxRotation:0,color:'#94a3b8'}},
-        y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},
-      }
+  // 3. Avg resolution time from 2 date cols
+  if(sch.primaryDate&&sch.secondaryDate){
+    const times = rows.map(r=>{
+      const d1=parseDate(r[sch.primaryDate]), d2=parseDate(r[sch.secondaryDate]);
+      if(d1&&d2&&!isNaN(d1)&&!isNaN(d2)&&d2>d1) return (d2-d1)/3600000;
+      return null;
+    }).filter(t=>t!==null);
+    if(times.length){
+      const avg = times.reduce((s,v)=>s+v,0)/times.length;
+      const display = avg>=24 ? `${(avg/24).toFixed(1)}d` : `${avg.toFixed(1)}h`;
+      kpis.push({label:'Avg Resolution', value:display, color:'yellow', icon:'⏱', sub:`from ${times.length.toLocaleString()} records`});
     }
-  });
-}
-
-// ─────────────────────────────────────────────────────────
-// BAR CHART — by best available categorical field
-// ─────────────────────────────────────────────────────────
-function renderBarChart(tickets){
-  // Cascade: category → department → agent → priority
-  const CANDIDATES = [
-    { key:'category',   label:'Category' },
-    { key:'department', label:'Department' },
-    { key:'agent',      label:'Agent' },
-    { key:'priority',   label:'Priority' },
-  ];
-  let chosen = null, subset = [];
-  for(const c of CANDIDATES){
-    const s = tickets.filter(t => t[c.key]);
-    if(s.length){ chosen = c; subset = s; break; }
   }
 
-  const fieldEl = document.getElementById('bar-chart-field');
-  if(!chosen){ showPlaceholder('bar',true); if(fieldEl) fieldEl.textContent='Category'; barChartField=null; return; }
-
-  showPlaceholder('bar',false);
-  barChartField = chosen.key;
-  if(fieldEl) fieldEl.textContent = chosen.label;
-
-  const counts = {};
-  subset.forEach(t => { counts[t[chosen.key]] = (counts[t[chosen.key]]||0) + 1; });
-  const labels = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
-  const data = labels.map(l => counts[l]);
-
-  const PALETTE = ['rgba(99,102,241,.75)','rgba(139,92,246,.75)','rgba(6,182,212,.75)','rgba(245,158,11,.75)','rgba(16,185,129,.75)','rgba(239,68,68,.75)','rgba(249,115,22,.75)','rgba(236,72,153,.75)'];
-  const borders = ['#6366f1','#8b5cf6','#06b6d4','#f59e0b','#10b981','#ef4444','#f97316','#ec4899'];
-
-  makeChart('barChart',{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{
-        label:'Tickets',
-        data,
-        backgroundColor:labels.map((_,i) => PALETTE[i % PALETTE.length]),
-        borderColor:labels.map((_,i) => borders[i % borders.length]),
-        borderWidth:2,
-        borderRadius:6,
-        borderSkipped:false,
-      }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} tickets`}}},
-      scales:{
-        x:{grid:{display:false},ticks:{color:'#94a3b8'}},
-        y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},
-      }
+  // 4. Number column avg (if space)
+  if(sch.numberCols.length&&kpis.length<4){
+    const col = sch.numberCols[0];
+    const nums = rows.map(r=>parseFloat(String(r[col]||'').replace(/[,$%\s]/g,''))).filter(n=>!isNaN(n)&&n>=0);
+    if(nums.length){
+      const avg = nums.reduce((s,v)=>s+v,0)/nums.length;
+      const isCurrency = /salary|amount|revenue|cost|price|pay/i.test(col);
+      const isHrs = /hour|time|duration|hrs/i.test(col);
+      let display;
+      if(isCurrency) display = avg>=1000 ? `$${(avg/1000).toFixed(1)}K` : `$${avg.toFixed(0)}`;
+      else if(isHrs)  display = `${avg.toFixed(1)}h`;
+      else            display = avg.toFixed(1);
+      kpis.push({label:`Avg ${col}`, value:display, color:'cyan', icon:'📊', sub:`${nums.length.toLocaleString()} values`});
     }
-  });
-}
-
-// ─────────────────────────────────────────────────────────
-// PIE CHART — status distribution
-// ─────────────────────────────────────────────────────────
-function renderPieChart(tickets){
-  const withStat = tickets.filter(t => t.status);
-  if(!withStat.length){ showPlaceholder('pie',true); return; }
-  showPlaceholder('pie',false);
-
-  const counts = {};
-  withStat.forEach(t => { counts[t.status] = (counts[t.status]||0) + 1; });
-  const labels = Object.keys(counts);
-  const data = labels.map(l => counts[l]);
-
-  const COLOR_MAP = {
-    open:'rgba(239,68,68,.75)', resolved:'rgba(16,185,129,.75)',
-    pending:'rgba(245,158,11,.75)', closed:'rgba(16,185,129,.75)',
-  };
-  const BORDER_MAP = { open:'#ef4444', resolved:'#10b981', pending:'#f59e0b', closed:'#10b981' };
-  const FALLBACK = ['rgba(99,102,241,.75)','rgba(139,92,246,.75)','rgba(6,182,212,.75)','rgba(249,115,22,.75)'];
-  const FB_B = ['#6366f1','#8b5cf6','#06b6d4','#f97316'];
-  const bgs = labels.map((l,i) => COLOR_MAP[l.toLowerCase()] || FALLBACK[i % FALLBACK.length]);
-  const borders = labels.map((l,i) => BORDER_MAP[l.toLowerCase()] || FB_B[i % FB_B.length]);
-
-  makeChart('pieChart',{
-    type:'doughnut',
-    data:{ labels, datasets:[{ data, backgroundColor:bgs, borderColor:borders, borderWidth:2, hoverOffset:8 }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      cutout:'62%',
-      plugins:{
-        legend:{ position:'bottom', labels:{ padding:14, color:'#94a3b8', usePointStyle:true, pointStyle:'circle' } },
-        tooltip:{...TT, callbacks:{ label:c => {
-          const pct = ((c.parsed / withStat.length)*100).toFixed(1);
-          return ` ${c.parsed} (${pct}%)`;
-        }}}
-      }
-    }
-  });
-}
-
-// ─────────────────────────────────────────────────────────
-// PRIORITY CHART — stacked horizontal bar by status
-// ─────────────────────────────────────────────────────────
-function renderPriorityChart(tickets){
-  const withPri = tickets.filter(t => t.priority);
-  if(!withPri.length){ showPlaceholder('pri',true); return; }
-  showPlaceholder('pri',false);
-
-  const PRIORITY_ORDER = ['Critical','High','Medium','Low'];
-  const priorities = [...new Set(withPri.map(t => t.priority))];
-  priorities.sort((a,b) => {
-    const ia = PRIORITY_ORDER.findIndex(x => x.toLowerCase()===a.toLowerCase());
-    const ib = PRIORITY_ORDER.findIndex(x => x.toLowerCase()===b.toLowerCase());
-    return (ia===-1?99:ia) - (ib===-1?99:ib);
-  });
-
-  const statuses = [...new Set(withPri.map(t => t.status).filter(Boolean))];
-  const STAT_COLOR = {
-    open:['rgba(239,68,68,.75)','#ef4444'],
-    resolved:['rgba(16,185,129,.75)','#10b981'],
-    pending:['rgba(245,158,11,.75)','#f59e0b'],
-    closed:['rgba(16,185,129,.75)','#10b981'],
-  };
-  const FB = [['rgba(99,102,241,.75)','#6366f1'],['rgba(139,92,246,.75)','#8b5cf6'],['rgba(6,182,212,.75)','#06b6d4']];
-
-  const datasets = statuses.map((s,i) => {
-    const [bg,border] = STAT_COLOR[s.toLowerCase()] || FB[i % FB.length];
-    return {
-      label: s,
-      data: priorities.map(p => withPri.filter(t => t.priority===p && t.status===s).length),
-      backgroundColor: bg,
-      borderColor: border,
-      borderWidth: 1,
-      borderRadius: 4,
-    };
-  });
-
-  makeChart('priorityChart',{
-    type:'bar',
-    data:{ labels:priorities, datasets },
-    options:{
-      indexAxis:'y',
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{ position:'bottom', labels:{ padding:14, color:'#94a3b8', usePointStyle:true, pointStyle:'circle' } },
-        tooltip:{...TT}
-      },
-      scales:{
-        x:{ stacked:true, beginAtZero:true, grid:{color:'rgba(45,55,72,.5)'}, ticks:{precision:0,color:'#94a3b8'} },
-        y:{ stacked:true, grid:{display:false}, ticks:{color:'#94a3b8'} },
-      }
-    }
-  });
-}
-
-// ─────────────────────────────────────────────────────────
-// TABLE — 10 most recent
-// ─────────────────────────────────────────────────────────
-function statusPill(s){
-  if(!s) return '<span class="pill p-other">—</span>';
-  const l = s.toLowerCase();
-  const cls = l.includes('open') ? 'p-open' : l.includes('resolv') || l.includes('close') || l.includes('done') ? 'p-resolved' : l.includes('pend') ? 'p-pending' : 'p-other';
-  return `<span class="pill ${cls}">${s}</span>`;
-}
-function priorityPill(p){
-  if(!p) return '<span class="pill p-other">—</span>';
-  const l = p.toLowerCase();
-  const cls = l.includes('crit') ? 'p-critical' : l.includes('high') ? 'p-high' : l.includes('med') ? 'p-medium' : l.includes('low') ? 'p-low' : 'p-other';
-  return `<span class="pill ${cls}">${p}</span>`;
-}
-
-function renderTable(tickets){
-  const sorted = [...tickets].sort((a,b) => (b._date||0) - (a._date||0)).slice(0,10);
-  const hasCategory = tickets.some(t => t.category);
-  document.getElementById('tbl-head').innerHTML = `
-    <tr>
-      <th>Ticket ID</th><th>Date</th>${hasCategory ? '<th>Category</th>' : ''}
-      <th>Priority</th><th>Status</th><th>Resolution (hrs)</th>
-    </tr>`;
-  document.getElementById('tbl-body').innerHTML = sorted.map(t => `
-    <tr>
-      <td><span class="tid">${t.ticket_id||'—'}</span></td>
-      <td>${t.date||'—'}</td>
-      ${hasCategory ? `<td>${t.category||'—'}</td>` : ''}
-      <td>${priorityPill(t.priority)}</td>
-      <td>${statusPill(t.status)}</td>
-      <td>${t.resolution_time_hours > 0 ? `<strong>${t.resolution_time_hours}h</strong>` : '<span style="color:var(--muted2)">—</span>'}</td>
-    </tr>`).join('');
-}
-
-// ─────────────────────────────────────────────────────────
-// DYNAMIC CHARTS — agent / dept / csat / auto categorical
-// ─────────────────────────────────────────────────────────
-
-const DYN_PALETTE = [
-  'rgba(99,102,241,.75)','rgba(139,92,246,.75)','rgba(6,182,212,.75)',
-  'rgba(245,158,11,.75)','rgba(16,185,129,.75)','rgba(239,68,68,.75)',
-  'rgba(249,115,22,.75)','rgba(236,72,153,.75)','rgba(20,184,166,.75)',
-  'rgba(251,191,36,.75)',
-];
-const DYN_BORDERS = [
-  '#6366f1','#8b5cf6','#06b6d4','#f59e0b','#10b981',
-  '#ef4444','#f97316','#ec4899','#14b8a6','#fbbf24',
-];
-
-function isCategoricalCol(header, tickets){
-  const vals = tickets.map(t => t._row && t._row[header]).filter(v => v && String(v).trim());
-  if(vals.length < 3) return false;
-  const unique = new Set(vals.map(v => String(v).trim().toLowerCase()));
-  // categorical: at least 2 distinct values, at most 50% of total unique (avoid free-text)
-  return unique.size >= 2 && unique.size <= Math.max(15, vals.length * 0.5);
-}
-
-function createDynBox(id, title, icon){
-  const wrap = document.createElement('div');
-  wrap.className = 'chart-box';
-  wrap.innerHTML = `
-    <div class="chart-hdr"><h3>${icon} ${title}</h3></div>
-    <div class="chart-body" style="height:240px">
-      <canvas id="${id}"></canvas>
-    </div>`;
-  return wrap;
-}
-
-function renderAgentChart(tickets, grid){
-  const withAgent = tickets.filter(t => t.agent);
-  if(!withAgent.length) return;
-  const counts = {};
-  withAgent.forEach(t => { counts[t.agent] = (counts[t.agent]||0) + 1; });
-  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,12);
-  const labels = sorted.map(e => e[0]);
-  const data   = sorted.map(e => e[1]);
-
-  const box = createDynBox('dyn_agent','Agent Workload','👤');
-  grid.appendChild(box);
-
-  if(charts['dyn_agent']) charts['dyn_agent'].destroy();
-  charts['dyn_agent'] = new Chart(document.getElementById('dyn_agent'), {
-    type:'bar',
-    data:{ labels, datasets:[{ label:'Tickets', data,
-      backgroundColor:labels.map((_,i) => DYN_PALETTE[i%DYN_PALETTE.length]),
-      borderColor:labels.map((_,i) => DYN_BORDERS[i%DYN_BORDERS.length]),
-      borderWidth:2, borderRadius:5, borderSkipped:false }] },
-    options:{
-      indexAxis:'y', responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x} tickets`}}},
-      scales:{
-        x:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},
-        y:{grid:{display:false},ticks:{color:'#94a3b8'}},
-      }
-    }
-  });
-}
-
-function renderDeptChart(tickets, grid){
-  const withDept = tickets.filter(t => t.department);
-  if(!withDept.length) return;
-  const counts = {};
-  withDept.forEach(t => { counts[t.department] = (counts[t.department]||0) + 1; });
-  const labels = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
-  const data   = labels.map(l => counts[l]);
-
-  const box = createDynBox('dyn_dept','Department Breakdown','🏢');
-  grid.appendChild(box);
-
-  if(charts['dyn_dept']) charts['dyn_dept'].destroy();
-  charts['dyn_dept'] = new Chart(document.getElementById('dyn_dept'), {
-    type:'doughnut',
-    data:{ labels, datasets:[{ data,
-      backgroundColor:labels.map((_,i) => DYN_PALETTE[i%DYN_PALETTE.length]),
-      borderColor:labels.map((_,i) => DYN_BORDERS[i%DYN_BORDERS.length]),
-      borderWidth:2, hoverOffset:8 }] },
-    options:{
-      responsive:true, maintainAspectRatio:false, cutout:'58%',
-      plugins:{
-        legend:{ position:'bottom', labels:{ padding:12, color:'#94a3b8', usePointStyle:true, pointStyle:'circle' } },
-        tooltip:{...TT,callbacks:{label:c=>{
-          const pct = ((c.parsed/withDept.length)*100).toFixed(1);
-          return ` ${c.parsed} (${pct}%)`;
-        }}}
-      }
-    }
-  });
-}
-
-function renderCSATChart(tickets, grid){
-  const withScore = tickets.filter(t => t.satisfaction_score !== null && t.satisfaction_score !== undefined);
-  if(!withScore.length) return;
-  const scores = withScore.map(t => t.satisfaction_score);
-  const avg = (scores.reduce((s,v) => s+v, 0) / scores.length).toFixed(2);
-
-  // Bucket into bins
-  const min = Math.floor(Math.min(...scores));
-  const max = Math.ceil(Math.max(...scores));
-  const range = max - min;
-  const binCount = Math.min(10, range > 0 ? range : 5);
-  const binSize = range > 0 ? range / binCount : 1;
-  const bins = Array.from({length:binCount}, (_,i) => {
-    const lo = min + i * binSize;
-    const hi = lo + binSize;
-    return { label: range > 5 ? `${lo.toFixed(0)}–${hi.toFixed(0)}` : lo.toFixed(1),
-             count: scores.filter(s => s >= lo && (i===binCount-1 ? s<=hi : s<hi)).length };
-  }).filter(b => b.count > 0);
-
-  const box = createDynBox('dyn_csat',`CSAT Distribution · avg ${avg}`,'⭐');
-  grid.appendChild(box);
-
-  if(charts['dyn_csat']) charts['dyn_csat'].destroy();
-  charts['dyn_csat'] = new Chart(document.getElementById('dyn_csat'), {
-    type:'bar',
-    data:{ labels:bins.map(b=>b.label), datasets:[{ label:'Responses', data:bins.map(b=>b.count),
-      backgroundColor:'rgba(245,158,11,.7)', borderColor:'#f59e0b',
-      borderWidth:2, borderRadius:5, borderSkipped:false }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT}},
-      scales:{
-        x:{grid:{display:false},ticks:{color:'#94a3b8'}},
-        y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},
-      }
-    }
-  });
-}
-
-function renderAutoChart(col, tickets, grid, idx){
-  const vals = tickets.map(t => t._row && String(t._row[col]||'').trim()).filter(Boolean);
-  if(!vals.length) return;
-  const counts = {};
-  vals.forEach(v => { counts[v] = (counts[v]||0) + 1; });
-  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,15);
-  const labels = sorted.map(e => e[0]);
-  const data   = sorted.map(e => e[1]);
-  const id = `dyn_auto_${idx}`;
-
-  const safeLabel = col.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  const box = createDynBox(id, `Tickets by ${safeLabel}`, '📊');
-  grid.appendChild(box);
-
-  if(charts[id]) charts[id].destroy();
-  charts[id] = new Chart(document.getElementById(id), {
-    type:'bar',
-    data:{ labels, datasets:[{ label:'Tickets', data,
-      backgroundColor:labels.map((_,i) => DYN_PALETTE[(i+idx*3)%DYN_PALETTE.length]),
-      borderColor:labels.map((_,i) => DYN_BORDERS[(i+idx*3)%DYN_BORDERS.length]),
-      borderWidth:2, borderRadius:5, borderSkipped:false }] },
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} tickets`}}},
-      scales:{
-        x:{grid:{display:false},ticks:{color:'#94a3b8',maxRotation:30}},
-        y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},
-      }
-    }
-  });
-}
-
-function renderDynamicCharts(tickets){
-  // Destroy old dyn_* charts
-  Object.keys(charts).filter(k => k.startsWith('dyn_')).forEach(k => {
-    charts[k].destroy(); delete charts[k];
-  });
-
-  const section = document.getElementById('dynamic-section');
-  const grid    = document.getElementById('dynamic-grid');
-  grid.innerHTML = '';
-
-  if(isDemo || !currentHeaders.length){ section.style.display = 'none'; return; }
-
-  // Known special fields
-  renderAgentChart(tickets, grid);
-  renderDeptChart(tickets, grid);
-  renderCSATChart(tickets, grid);
-
-  // Already-handled field keys and their CSV column names (to avoid duplication)
-  const ALL_FIELDS = [...FIELDS, ...DYNAMIC_FIELDS];
-  const mappedCols = new Set(Object.values(currentMapping).filter(Boolean));
-
-  // Find remaining unmapped CSV columns that look categorical
-  const usedInMain = new Set([barChartField].filter(Boolean)
-    .map(k => currentMapping[k]).filter(Boolean));
-
-  let autoIdx = 0;
-  currentHeaders.forEach(col => {
-    if(mappedCols.has(col)) return; // already used by a known field
-    if(!isCategoricalCol(col, tickets)) return;
-    renderAutoChart(col, tickets, grid, autoIdx++);
-  });
-
-  section.style.display = grid.children.length ? '' : 'none';
-}
-
-// ─────────────────────────────────────────────────────────
-// RENDER ALL
-// ─────────────────────────────────────────────────────────
-function renderAll(tickets){
-  const empty   = document.getElementById('empty-state');
-  const content = document.getElementById('dashboard-content');
-  if(!tickets.length){
-    empty.style.display   = 'flex';
-    content.style.display = 'none';
-    updateFilterSummary(tickets);
-    return;
   }
-  empty.style.display   = 'none';
-  content.style.display = '';
-  renderKPIs(tickets);
-  renderLineChart(tickets);
-  renderBarChart(tickets);
-  renderPieChart(tickets);
-  renderPriorityChart(tickets);
-  renderDynamicCharts(tickets);
-  renderTable(tickets);
-  updateFilterSummary(tickets);
+
+  const COLORS = ['blue','red','yellow','green','cyan','orange'];
+  document.getElementById('kpi-container').innerHTML = kpis.slice(0,4).map((k,i)=>`
+    <div class="kpi-card kpi-${k.color||COLORS[i]}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub||''}</div>
+      <div class="kpi-icon">${k.icon}</div>
+    </div>`).join('');
 }
 
 // ─────────────────────────────────────────────────────────
-// FILTERS
+// FILTER BAR
 // ─────────────────────────────────────────────────────────
-function populateFilters(tickets){
-  const cats  = [...new Set(tickets.map(t => t.category).filter(Boolean))].sort();
-  const stats = [...new Set(tickets.map(t => t.status).filter(Boolean))].sort();
-  const pris  = [...new Set(tickets.map(t => t.priority).filter(Boolean))];
-  const PRI_ORDER = ['Critical','High','Medium','Low'];
-  pris.sort((a,b) => {
-    const ia = PRI_ORDER.findIndex(x => x.toLowerCase()===a.toLowerCase());
-    const ib = PRI_ORDER.findIndex(x => x.toLowerCase()===b.toLowerCase());
-    return (ia===-1?99:ia) - (ib===-1?99:ib);
+function buildFilters(sch){
+  const row = document.getElementById('filter-row');
+  const groups = [];
+
+  if(sch.primaryDate){
+    const dates = rawRows.map(r=>parseDate(r[sch.primaryDate])).filter(d=>d&&!isNaN(d)).sort((a,b)=>a-b);
+    const mn = dates.length ? toDateKey(dates[0]) : '';
+    const mx = dates.length ? toDateKey(dates[dates.length-1]) : '';
+    groups.push(`
+      <div class="filter-group">
+        <label>From Date</label>
+        <input type="date" class="filter-input" id="f-date-from" min="${mn}" max="${mx}">
+      </div>
+      <div class="filter-group">
+        <label>To Date</label>
+        <input type="date" class="filter-input" id="f-date-to" min="${mn}" max="${mx}">
+      </div>`);
+  }
+
+  const filterCols = [sch.statusCol, sch.agentCol, sch.priorityCol, ...(sch.categoricalCols||[]).slice(0,2)].filter(Boolean);
+  filterCols.forEach(col=>{
+    const isAgent = col===sch.agentCol;
+    const vals = [...new Set(rawRows.map(r=>{ let v=String(r[col]||'').trim(); if(isAgent) v=cleanAgentName(v); return v; }).filter(Boolean))].sort();
+    if(vals.length<2||vals.length>60) return;
+    groups.push(`
+      <div class="filter-group">
+        <label>${col}</label>
+        <select class="filter-select dyn-filter" data-col="${col.replace(/"/g,'&quot;')}" data-isagent="${isAgent}">
+          <option value="">All ${col}</option>
+          ${vals.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('')}
+        </select>
+      </div>`);
   });
 
-  function fill(id, items, allLabel){
-    const sel  = document.getElementById(id);
-    const prev = sel.value;
-    sel.innerHTML = `<option value="">${allLabel}</option>` +
-      items.map(v => `<option value="${v}">${v}</option>`).join('');
-    if(items.includes(prev)) sel.value = prev;
-  }
-  fill('f-category', cats,  'All Categories');
-  fill('f-priority', pris,  'All Priorities');
-  fill('f-status',   stats, 'All Statuses');
+  groups.push(`
+    <div class="filter-actions">
+      <button class="btn btn-primary" id="btn-apply-filters">Apply Filters</button>
+      <button class="btn" id="btn-reset-filters">Reset</button>
+    </div>`);
 
-  // Set calendar min/max to actual data range
-  const dates = tickets.map(t => t._date).filter(Boolean).sort((a,b) => a-b);
-  if(dates.length){
-    const mn = toDateKey(dates[0]);
-    const mx = toDateKey(dates[dates.length-1]);
-    document.getElementById('f-date-from').min = mn;
-    document.getElementById('f-date-from').max = mx;
-    document.getElementById('f-date-to').min   = mn;
-    document.getElementById('f-date-to').max   = mx;
-  }
-}
+  row.innerHTML = groups.join('');
 
-function getActiveFilters(){
-  return {
-    dateFrom: document.getElementById('f-date-from').value,
-    dateTo:   document.getElementById('f-date-to').value,
-    category: document.getElementById('f-category').value,
-    priority: document.getElementById('f-priority').value,
-    status:   document.getElementById('f-status').value,
-  };
+  document.getElementById('btn-apply-filters').addEventListener('click', applyFilters);
+  document.getElementById('btn-reset-filters').addEventListener('click', resetFilters);
+  if(sch.primaryDate){
+    ['f-date-from','f-date-to'].forEach(id=>{
+      document.getElementById(id)?.addEventListener('keydown', e=>{ if(e.key==='Enter') applyFilters(); });
+    });
+  }
 }
 
 function applyFilters(){
-  const f = getActiveFilters();
-  let filtered = [...currentTickets];
+  let result = [...rawRows];
+  let activeCount = 0;
 
-  if(f.dateFrom){
-    const from = new Date(f.dateFrom); from.setHours(0,0,0,0);
-    filtered = filtered.filter(t => t._date >= from);
+  const fromEl = document.getElementById('f-date-from');
+  const toEl   = document.getElementById('f-date-to');
+  if(fromEl?.value){
+    const from = new Date(fromEl.value); from.setHours(0,0,0,0);
+    result = result.filter(r=>{ const d=parseDate(r[schema.primaryDate]); return d&&!isNaN(d)&&d>=from; });
+    activeCount++;
   }
-  if(f.dateTo){
-    const to = new Date(f.dateTo); to.setHours(23,59,59,999);
-    filtered = filtered.filter(t => t._date <= to);
+  if(toEl?.value){
+    const to = new Date(toEl.value); to.setHours(23,59,59,999);
+    result = result.filter(r=>{ const d=parseDate(r[schema.primaryDate]); return d&&!isNaN(d)&&d<=to; });
+    activeCount++;
   }
-  if(f.category) filtered = filtered.filter(t => t.category === f.category);
-  if(f.priority) filtered = filtered.filter(t => t.priority === f.priority);
-  if(f.status)   filtered = filtered.filter(t => t.status   === f.status);
 
-  const activeCount = [f.dateFrom,f.dateTo,f.category,f.priority,f.status].filter(Boolean).length;
+  document.querySelectorAll('.dyn-filter').forEach(sel=>{
+    const col = sel.dataset.col;
+    const isAgent = sel.dataset.isagent==='true';
+    const val = sel.value;
+    if(val){
+      result = result.filter(r=>{ let v=String(r[col]||'').trim(); if(isAgent) v=cleanAgentName(v); return v===val; });
+      activeCount++;
+    }
+  });
+
   const badge = document.getElementById('filter-badge');
-  badge.textContent    = activeCount;
-  badge.style.display  = activeCount ? '' : 'none';
-
-  renderAll(filtered);
+  badge.textContent = activeCount;
+  badge.style.display = activeCount ? '' : 'none';
+  filteredRows = result;
+  renderAll(filteredRows);
 }
 
 function resetFilters(){
-  clearFilterUI();
-  renderAll(currentTickets);
+  const fromEl = document.getElementById('f-date-from');
+  const toEl   = document.getElementById('f-date-to');
+  if(fromEl) fromEl.value='';
+  if(toEl)   toEl.value='';
+  document.querySelectorAll('.dyn-filter').forEach(s=>s.value='');
+  document.getElementById('filter-badge').style.display='none';
+  filteredRows = [...rawRows];
+  renderAll(filteredRows);
 }
 
-function clearFilterUI(){
-  document.getElementById('f-date-from').value = '';
-  document.getElementById('f-date-to').value   = '';
-  document.getElementById('f-category').value  = '';
-  document.getElementById('f-priority').value  = '';
-  document.getElementById('f-status').value    = '';
-  document.getElementById('filter-badge').style.display   = 'none';
-  document.getElementById('filter-summary').style.display = 'none';
-}
-
-function updateFilterSummary(filtered){
-  const f = getActiveFilters();
-  const active = [
-    f.dateFrom ? `From: ${f.dateFrom}` : null,
-    f.dateTo   ? `To: ${f.dateTo}`     : null,
-    f.category ? `Category: ${f.category}` : null,
-    f.priority ? `Priority: ${f.priority}` : null,
-    f.status   ? `Status: ${f.status}`     : null,
-  ].filter(Boolean);
-
+function updateFilterSummary(rows){
   const summary = document.getElementById('filter-summary');
-  if(!active.length){ summary.style.display = 'none'; return; }
+  const active = [];
+  const fromEl = document.getElementById('f-date-from');
+  const toEl   = document.getElementById('f-date-to');
+  if(fromEl?.value) active.push(`From: ${fromEl.value}`);
+  if(toEl?.value)   active.push(`To: ${toEl.value}`);
+  document.querySelectorAll('.dyn-filter').forEach(s=>{ if(s.value) active.push(`${s.dataset.col}: ${s.value}`); });
 
-  document.getElementById('filter-count-shown').textContent = filtered.length;
-  document.getElementById('filter-count-total').textContent = currentTickets.length;
-  document.getElementById('active-filter-tags').innerHTML   =
-    active.map(a => `<span class="filter-tag">${a}</span>`).join('');
-  summary.style.display = 'flex';
+  if(!active.length){ summary.style.display='none'; return; }
+  summary.innerHTML = `Showing <strong>${rows.length.toLocaleString()}</strong> of <strong>${rawRows.length.toLocaleString()}</strong> records &nbsp;·&nbsp; ${active.map(a=>`<span class="filter-tag">${a}</span>`).join('')}`;
+  summary.style.display='flex';
 }
 
 // ─────────────────────────────────────────────────────────
-// MAPPING TOAST — shows what was auto-detected
+// CHART HELPERS
 // ─────────────────────────────────────────────────────────
-function showMappingToast(mapping, filename, allHeaders){
-  const ALL_FIELDS = [...FIELDS, ...DYNAMIC_FIELDS];
-  const mapped = ALL_FIELDS.filter(f => mapping[f.key]);
-  const missedCore = FIELDS.filter(f => !mapping[f.key]);
+function createChartBox(id, title, full=false, tall=false){
+  const box = document.createElement('div');
+  box.className = `chart-box${full?' chart-full':''}`;
+  box.innerHTML = `<div class="chart-hdr"><h3>${title}</h3></div><div class="chart-body${tall?' tall':''}"><canvas id="${id}"></canvas></div>`;
+  return box;
+}
 
-  const rows = mapped.map(f =>
-    `<div class="mt-row">
-       <span class="mt-field">${f.icon} ${f.label}</span>
-       <span class="mt-sep">←</span>
-       <span class="mt-col" title="${mapping[f.key]}">${mapping[f.key]}</span>
-     </div>`
-  ).join('');
+function destroyAllCharts(){
+  Object.values(charts).forEach(c=>{ try{c.destroy();}catch(_){} });
+  for(const k in charts) delete charts[k];
+}
 
-  const missedHtml = missedCore.length
-    ? `<div class="mt-missed">⚠ Not detected: ${missedCore.map(f=>f.label).join(', ')}</div>`
-    : '';
+function mkChart(id, config){
+  if(charts[id]) charts[id].destroy();
+  const el = document.getElementById(id);
+  if(!el) return;
+  charts[id] = new Chart(el, config);
+}
 
-  // Extra unmapped columns that will get auto charts
-  const mappedCols = new Set(Object.values(mapping).filter(Boolean));
-  const extraCols = (allHeaders||[]).filter(h => !mappedCols.has(h));
-  const extraHtml = extraCols.length
-    ? `<div class="mt-extra">📊 Extra charts for: ${extraCols.map(c=>`<span class="mt-col">${c}</span>`).join(' ')}</div>`
-    : '';
+// ─────────────────────────────────────────────────────────
+// CHART BUILDERS
+// ─────────────────────────────────────────────────────────
+function makeTimeSeriesChart(rows, sch, grid){
+  if(!sch.primaryDate) return;
+  const dated = rows.map(r=>({d:parseDate(r[sch.primaryDate])})).filter(x=>x.d&&!isNaN(x.d)).sort((a,b)=>a.d-b.d);
+  if(dated.length<2) return;
 
-  const el = document.createElement('div');
-  el.className = 'toast toast-map';
-  el.innerHTML = `
-    <div class="mt-head">✓ Auto-mapped ${mapped.length}/${ALL_FIELDS.length} columns
-      <em>— ${filename}</em>
-    </div>
-    <div class="mt-grid">${rows}</div>
-    ${missedHtml}${extraHtml}`;
+  const span = (dated[dated.length-1].d - dated[0].d)/86400000;
+  let keyFn, labelFn;
+  if(span<=31){
+    keyFn=d=>toDateKey(d);
+    labelFn=k=>{ const [,m,d]=k.split('-'); return `${d} ${MONTH_NAMES[parseInt(m)-1]}`; };
+  } else if(span<=180){
+    keyFn=d=>{ const ws=new Date(d); ws.setDate(ws.getDate()-ws.getDay()); return toDateKey(ws); };
+    labelFn=k=>{ const [,m,d]=k.split('-'); return `${d} ${MONTH_NAMES[parseInt(m)-1]}`; };
+  } else {
+    keyFn=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}`;
+    labelFn=k=>{ const [y,m]=k.split('-'); return `${MONTH_NAMES[parseInt(m)-1]} ${y}`; };
+  }
+  const cnts = {};
+  dated.forEach(({d})=>{ const k=keyFn(d); cnts[k]=(cnts[k]||0)+1; });
+  const keys = Object.keys(cnts).sort();
+  const labels = keys.map(labelFn);
+  const data = keys.map(k=>cnts[k]);
 
-  document.getElementById('toasts').appendChild(el);
-  requestAnimationFrame(() => { requestAnimationFrame(() => el.classList.add('show')); });
-  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 9000);
+  const id = 'chart_timeseries';
+  const box = createChartBox(id, `📈 Volume Over Time (${sch.primaryDate})`, true, true);
+  grid.appendChild(box);
+  mkChart(id,{
+    type:'line',
+    data:{labels,datasets:[{label:'Records',data,borderColor:'#6366f1',backgroundColor:'rgba(99,102,241,.12)',tension:.35,fill:true,pointRadius:data.length<=30?4:2,pointBackgroundColor:'#6366f1',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y} records`}}},
+      scales:{x:{grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8',maxRotation:30,maxTicksLimit:14}},y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}}}}
+  });
+}
+
+function makeStatusChart(rows, sch, grid){
+  if(!sch.statusCol) return;
+  const cnts = {};
+  rows.forEach(r=>{ const v=String(r[sch.statusCol]||'').trim(); if(v) cnts[v]=(cnts[v]||0)+1; });
+  if(!Object.keys(cnts).length) return;
+  const labels = Object.keys(cnts).sort((a,b)=>cnts[b]-cnts[a]);
+  const data = labels.map(l=>cnts[l]);
+  const total = data.reduce((s,v)=>s+v,0);
+  const bgs = labels.map((l,i)=>{ const v=l.toLowerCase(); return /open|active|new/.test(v)?'rgba(239,68,68,.75)':/resolv|clos|done|complet/.test(v)?'rgba(16,185,129,.75)':/pend|wait|hold|wip|progress/.test(v)?'rgba(245,158,11,.75)':PALETTE[i%PALETTE.length]; });
+  const brd = labels.map((l,i)=>{ const v=l.toLowerCase(); return /open|active|new/.test(v)?'#ef4444':/resolv|clos|done|complet/.test(v)?'#10b981':/pend|wait|hold|wip|progress/.test(v)?'#f59e0b':BORDERS[i%BORDERS.length]; });
+
+  const id = 'chart_status';
+  const box = createChartBox(id, `🥧 ${sch.statusCol} Distribution`);
+  grid.appendChild(box);
+  mkChart(id,{
+    type:'doughnut',
+    data:{labels,datasets:[{data,backgroundColor:bgs,borderColor:brd,borderWidth:2,hoverOffset:8}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{padding:14,color:'#94a3b8',usePointStyle:true,pointStyle:'circle'}},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed} (${((c.parsed/total)*100).toFixed(1)}%)`}}}}
+  });
+}
+
+function makeAgentChart(rows, sch, grid){
+  if(!sch.agentCol) return;
+  const cnts = {};
+  rows.forEach(r=>{ const v=cleanAgentName(String(r[sch.agentCol]||'').trim()); if(v) cnts[v]=(cnts[v]||0)+1; });
+  if(!Object.keys(cnts).length) return;
+  const sorted = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const labels = sorted.map(e=>e[0]);
+  const data   = sorted.map(e=>e[1]);
+
+  const id = 'chart_agent';
+  const box = createChartBox(id, `👤 ${sch.agentCol} Workload`, false, true);
+  grid.appendChild(box);
+  mkChart(id,{
+    type:'bar',
+    data:{labels,datasets:[{label:'Records',data,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderColor:labels.map((_,i)=>BORDERS[i%BORDERS.length]),borderWidth:2,borderRadius:5,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.x} records`}}},
+      scales:{x:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{precision:0,color:'#94a3b8'}},y:{grid:{display:false},ticks:{color:'#94a3b8'}}}}
+  });
+}
+
+function makeCatBarChart(col, rows, grid, horizontal){
+  const cnts = {};
+  const isAgent = col===schema.agentCol;
+  rows.forEach(r=>{ let v=String(r[col]||'').trim(); if(isAgent) v=cleanAgentName(v); if(v) cnts[v]=(cnts[v]||0)+1; });
+  if(!Object.keys(cnts).length) return;
+  const sorted = Object.entries(cnts).sort((a,b)=>b[1]-a[1]).slice(0,horizontal?12:15);
+  const labels = sorted.map(e=>e[0]);
+  const data   = sorted.map(e=>e[1]);
+  const colInfo = schema.cols.find(c=>c.header===col);
+  const icon = TYPE_ICONS[colInfo?.type]||'📊';
+  const id = `chart_${sanitizeId(col)}`;
+  const box = createChartBox(id, `${icon} ${col}`, false, horizontal&&labels.length>6);
+  grid.appendChild(box);
+  mkChart(id,{
+    type:'bar',
+    data:{labels,datasets:[{label:'Records',data,backgroundColor:labels.map((_,i)=>PALETTE[i%PALETTE.length]),borderColor:labels.map((_,i)=>BORDERS[i%BORDERS.length]),borderWidth:2,borderRadius:5,borderSkipped:false}]},
+    options:{indexAxis:horizontal?'y':'x',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${horizontal?c.parsed.x:c.parsed.y} records`}}},
+      scales:{x:{beginAtZero:true,grid:{color:horizontal?'rgba(45,55,72,.5)':'none'},ticks:{precision:0,color:'#94a3b8',maxRotation:horizontal?0:30}},
+              y:{grid:{color:horizontal?'none':'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8'}}}}
+  });
+}
+
+function makeResolutionTrendChart(rows, sch, grid){
+  if(!sch.primaryDate||!sch.secondaryDate) return;
+  const points = rows.map(r=>{
+    const d1=parseDate(r[sch.primaryDate]), d2=parseDate(r[sch.secondaryDate]);
+    if(d1&&d2&&!isNaN(d1)&&!isNaN(d2)&&d2>d1) return {d:d1,hrs:(d2-d1)/3600000};
+    return null;
+  }).filter(Boolean).sort((a,b)=>a.d-b.d);
+  if(points.length<3) return;
+
+  const grps = {};
+  points.forEach(({d,hrs})=>{ const ws=new Date(d); ws.setDate(ws.getDate()-ws.getDay()); const k=toDateKey(ws); if(!grps[k]) grps[k]=[]; grps[k].push(hrs); });
+  const keys = Object.keys(grps).sort();
+  if(keys.length<2) return;
+  const labels = keys.map(k=>{ const [,m,d]=k.split('-'); return `${d} ${MONTH_NAMES[parseInt(m)-1]}`; });
+  const data = keys.map(k=>parseFloat((grps[k].reduce((s,v)=>s+v,0)/grps[k].length).toFixed(1)));
+
+  const id = 'chart_res_trend';
+  const box = createChartBox(id, `⏱ Resolution Time Trend (${sch.secondaryDate} − ${sch.primaryDate})`);
+  grid.appendChild(box);
+  mkChart(id,{
+    type:'line',
+    data:{labels,datasets:[{label:'Avg Hours',data,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.12)',tension:.35,fill:true,pointRadius:4,pointBackgroundColor:'#f59e0b',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>` ${c.parsed.y}h avg`}}},
+      scales:{x:{grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8',maxRotation:30}},y:{beginAtZero:true,grid:{color:'rgba(45,55,72,.5)'},ticks:{color:'#94a3b8'}}}}
+  });
+}
+
+function buildCharts(rows, sch){
+  destroyAllCharts();
+  const container = document.getElementById('charts-container');
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'charts-grid';
+  container.appendChild(grid);
+
+  let n = 0;
+  if(sch.primaryDate&&n<8){ makeTimeSeriesChart(rows,sch,grid); n++; }
+  if(sch.statusCol&&n<8){ makeStatusChart(rows,sch,grid); n++; }
+  const cats = sch.categoricalCols||[];
+  if(cats[0]&&n<8){ makeCatBarChart(cats[0],rows,grid,false); n++; }
+  if(sch.agentCol&&n<8){ makeAgentChart(rows,sch,grid); n++; }
+  if(sch.priorityCol&&n<8){ makeCatBarChart(sch.priorityCol,rows,grid,false); n++; }
+  if(sch.primaryDate&&sch.secondaryDate&&n<8){ makeResolutionTrendChart(rows,sch,grid); n++; }
+  for(let i=1;i<cats.length&&n<8;i++){ makeCatBarChart(cats[i],rows,grid,true); n++; }
+  if(!n) container.innerHTML = `<div style="text-align:center;padding:48px;color:var(--muted2);font-size:.88rem;">No chart-suitable columns detected in this dataset</div>`;
+}
+
+// ─────────────────────────────────────────────────────────
+// TABLE — all columns, 15 most recent
+// ─────────────────────────────────────────────────────────
+function buildTable(rows, sch){
+  const colMap = Object.fromEntries(sch.cols.map(c=>[c.header,c]));
+  const sorted = [...rows].sort((a,b)=>{
+    if(!sch.primaryDate) return 0;
+    return ((parseDate(b[sch.primaryDate])||0)-(parseDate(a[sch.primaryDate])||0));
+  }).slice(0,15);
+
+  const heads = rawHeaders.map(h=>`<th>${h}</th>`).join('');
+  const body = sorted.map(row=>`
+    <tr>${rawHeaders.map(h=>{
+      const info = colMap[h]||{type:'text'};
+      const raw = row[h];
+      const str = (raw!==null&&raw!==undefined&&String(raw).trim()!=='') ? String(raw).trim() : '';
+      if(!str) return `<td style="color:var(--muted2)">—</td>`;
+      if(info.type==='id')     return `<td><span class="tid">${str}</span></td>`;
+      if(info.type==='date'){  const d=parseDate(str); return `<td>${d&&!isNaN(d)?formatDate(d):str}</td>`; }
+      if(info.type==='agent')  return `<td>${cleanAgentName(str)||str}</td>`;
+      if(info.type==='status') return `<td>${statusPill(str)}</td>`;
+      if(info.type==='priority') return `<td>${priorityPill(str)}</td>`;
+      if(str.length>50) return `<td title="${str.replace(/"/g,'&quot;')}">${str.slice(0,50)}…</td>`;
+      return `<td>${str}</td>`;
+    }).join('')}</tr>`).join('');
+
+  document.getElementById('table-container').innerHTML = `
+    <h3>🗂 ${Math.min(rows.length,15)} Most Recent Records</h3>
+    <div class="tbl-scroll"><table><thead><tr>${heads}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
 // ─────────────────────────────────────────────────────────
@@ -1665,482 +1181,210 @@ function saveApiKey(){
   const val = document.getElementById('ai-key-input').value.trim();
   if(!val){ toast('Please enter an API key','error'); return; }
   apiKey = val;
-  document.getElementById('ai-key-input').value = '';
-  document.getElementById('ai-key-input').style.display = 'none';
-  document.getElementById('ai-key-save').style.display = 'none';
-  document.getElementById('ai-key-saved').style.display = '';
-  document.getElementById('ai-key-clear').style.display = '';
+  document.getElementById('ai-key-input').value='';
+  document.getElementById('ai-key-input').style.display='none';
+  document.getElementById('ai-key-save').style.display='none';
+  document.getElementById('ai-key-saved').style.display='';
+  document.getElementById('ai-key-clear').style.display='';
   toast('API key saved — AI features unlocked 🤖','success');
-  if(!isDemo && currentTickets.length) runAllAI(currentTickets);
+  if(rawRows.length) runAllAI(filteredRows.length?filteredRows:rawRows);
 }
 
 function clearApiKey(){
-  apiKey = '';
-  document.getElementById('ai-key-input').style.display = '';
-  document.getElementById('ai-key-save').style.display = '';
-  document.getElementById('ai-key-saved').style.display = 'none';
-  document.getElementById('ai-key-clear').style.display = 'none';
-  if(!isDemo && currentTickets.length) setupAISection(currentTickets);
+  apiKey='';
+  document.getElementById('ai-key-input').style.display='';
+  document.getElementById('ai-key-save').style.display='';
+  document.getElementById('ai-key-saved').style.display='none';
+  document.getElementById('ai-key-clear').style.display='none';
+  if(rawRows.length) setupAISection(filteredRows.length?filteredRows:rawRows);
 }
 
 // ─────────────────────────────────────────────────────────
-// AI — TICKET STATS BUILDER (summarized payload for API)
+// AI — DATA STATS BUILDER
 // ─────────────────────────────────────────────────────────
-function buildTicketStats(tickets){
-  if(!tickets.length) return null;
-  const dated = tickets.filter(t => t._date);
-  const dates = dated.map(t => t._date).sort((a,b) => a-b);
-  const minDate = dates[0]||null, maxDate = dates[dates.length-1]||null;
-  const countBy = (arr,fn) => { const m={}; arr.forEach(t=>{ const k=fn(t); if(k) m[k]=(m[k]||0)+1; }); return m; };
+function buildDataStats(rows, sch){
+  if(!rows.length) return null;
+  const countBy = fn=>{ const m={}; rows.forEach(r=>{ const k=fn(r); if(k) m[k]=(m[k]||0)+1; }); return m; };
 
-  const statusCounts   = countBy(tickets, t => t.status);
-  const priCounts      = countBy(tickets, t => t.priority);
-  const catCounts      = countBy(tickets, t => t.category);
-  const resolved       = tickets.filter(t => /resolv|closed|done/i.test(t.status||''));
-  const resolutionRate = ((resolved.length/tickets.length)*100).toFixed(1)+'%';
-  const withTime       = tickets.filter(t => t.resolution_time_hours > 0);
-  const avgResolutionHrs = withTime.length
-    ? (withTime.reduce((s,t) => s+t.resolution_time_hours,0)/withTime.length).toFixed(1) : null;
+  const stats = {
+    totalRows: rows.length, filename: currentFilename,
+    detectedColumns: { primaryDate:sch.primaryDate, secondaryDate:sch.secondaryDate, statusCol:sch.statusCol, agentCol:sch.agentCol, priorityCol:sch.priorityCol, categoricalCols:sch.categoricalCols, numberCols:sch.numberCols },
+  };
 
-  const resByPri = {};
-  ['Critical','High','Medium','Low'].forEach(p => {
-    const s = withTime.filter(t => t.priority&&t.priority.toLowerCase()===p.toLowerCase());
-    if(s.length) resByPri[p] = (s.reduce((a,t)=>a+t.resolution_time_hours,0)/s.length).toFixed(1);
-  });
-
-  const dowCounts = countBy(dated, t => t._date.toLocaleDateString('en-US',{weekday:'long'}));
-  const busiestDay = Object.entries(dowCounts).sort((a,b)=>b[1]-a[1])[0]?.[0]||null;
-
-  const agentMap = {};
-  tickets.forEach(t => {
-    if(!t.agent) return;
-    if(!agentMap[t.agent]) agentMap[t.agent] = {total:0,resolved:0,open:0,times:[]};
-    agentMap[t.agent].total++;
-    if(/resolv|closed|done/i.test(t.status||'')) agentMap[t.agent].resolved++;
-    if(/open|pending/i.test(t.status||'')) agentMap[t.agent].open++;
-    if(t.resolution_time_hours>0) agentMap[t.agent].times.push(t.resolution_time_hours);
-  });
-  const agentStats = Object.entries(agentMap).map(([name,s]) => ({
-    name, total:s.total, resolved:s.resolved, open:s.open,
-    resolutionRate: s.total ? Math.round(s.resolved/s.total*100)+'%' : '0%',
-    avgResHrs: s.times.length ? (s.times.reduce((a,b)=>a+b,0)/s.times.length).toFixed(1) : null,
-  })).sort((a,b)=>b.total-a.total).slice(0,12);
-
-  let weekOverWeek = null;
-  if(maxDate){
-    const cut  = new Date(maxDate); cut.setDate(cut.getDate()-7);
-    const cut2 = new Date(maxDate); cut2.setDate(cut2.getDate()-14);
-    const tw = dated.filter(t => t._date>=cut);
-    const lw = dated.filter(t => t._date>=cut2 && t._date<cut);
-    if(tw.length && lw.length){
-      weekOverWeek = {
-        thisWeek:tw.length, lastWeek:lw.length,
-        volumeChange:(((tw.length-lw.length)/lw.length)*100).toFixed(0)+'%',
-        thisPriority: countBy(tw, t=>t.priority),
-        lastPriority: countBy(lw, t=>t.priority),
-        thisResolved: tw.filter(t=>/resolv|closed|done/i.test(t.status||'')).length,
-        lastResolved: lw.filter(t=>/resolv|closed|done/i.test(t.status||'')).length,
-      };
-    }
+  if(sch.primaryDate){
+    const dates = rows.map(r=>parseDate(r[sch.primaryDate])).filter(d=>d&&!isNaN(d)).sort((a,b)=>a-b);
+    if(dates.length) stats.dateRange = `${formatDate(dates[0])} – ${formatDate(dates[dates.length-1])}`;
   }
 
-  const longPendingCount = maxDate ? tickets.filter(t =>
-    /open|pending/i.test(t.status||'') && t._date && (maxDate-t._date)/86400000>3
-  ).length : 0;
+  if(sch.statusCol){
+    stats.statusBreakdown = countBy(r=>String(r[sch.statusCol]||'').trim()||null);
+    const closed = Object.entries(stats.statusBreakdown).filter(([k])=>/resolv|clos|done|complet/i.test(k)).reduce((s,[,v])=>s+v,0);
+    stats.resolutionRate = ((closed/rows.length)*100).toFixed(1)+'%';
+    stats.resolvedCount = closed;
+  }
 
-  const dateRange = minDate && maxDate
-    ? `${minDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} – ${maxDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`
-    : 'N/A';
+  if(sch.primaryDate&&sch.secondaryDate){
+    const times = rows.map(r=>{ const d1=parseDate(r[sch.primaryDate]),d2=parseDate(r[sch.secondaryDate]); if(d1&&d2&&!isNaN(d1)&&!isNaN(d2)&&d2>d1) return (d2-d1)/3600000; return null; }).filter(t=>t!==null);
+    if(times.length){ stats.avgResolutionHrs=(times.reduce((s,v)=>s+v,0)/times.length).toFixed(1); stats.resolutionCount=times.length; }
+  }
 
-  return {
-    total: tickets.length, dateRange, resolutionRate, avgResolutionHrs,
-    statusCounts, priCounts, catCounts, resolutionByPriority:resByPri,
-    busiestDay, dowCounts,
-    agentStats: agentStats.length ? agentStats : null,
-    weekOverWeek, longPendingCount,
-    topCategory: Object.entries(catCounts).sort((a,b)=>b[1]-a[1])[0]?.[0]||null,
-    topAgent: agentStats[0]?.name||null,
-  };
+  if(sch.agentCol){
+    const ac = countBy(r=>cleanAgentName(String(r[sch.agentCol]||'').trim())||null);
+    stats.agentBreakdown = Object.fromEntries(Object.entries(ac).sort((a,b)=>b[1]-a[1]).slice(0,12));
+    stats.agentStats = Object.entries(stats.agentBreakdown).map(([name,total])=>{
+      const arows = rows.filter(r=>cleanAgentName(String(r[sch.agentCol]||'').trim())===name);
+      const resolved = sch.statusCol ? arows.filter(r=>/resolv|clos|done/i.test(String(r[sch.statusCol]||''))).length : 0;
+      const times2 = sch.primaryDate&&sch.secondaryDate ? arows.map(r=>{ const d1=parseDate(r[sch.primaryDate]),d2=parseDate(r[sch.secondaryDate]); if(d1&&d2&&!isNaN(d1)&&!isNaN(d2)&&d2>d1) return (d2-d1)/3600000; return null; }).filter(t=>t!==null) : [];
+      return {name,total,resolved,resolutionRate:total?Math.round(resolved/total*100)+'%':'0%',avgResHrs:times2.length?(times2.reduce((s,v)=>s+v,0)/times2.length).toFixed(1):null};
+    });
+  }
+
+  if(sch.priorityCol) stats.priorityBreakdown = countBy(r=>String(r[sch.priorityCol]||'').trim()||null);
+  if(sch.categoricalCols?.length){
+    stats.categoryBreakdowns={};
+    sch.categoricalCols.slice(0,3).forEach(col=>{ stats.categoryBreakdowns[col]=countBy(r=>String(r[col]||'').trim()||null); });
+  }
+
+  if(sch.primaryDate){
+    const dated = rows.map(r=>({...r,_d:parseDate(r[sch.primaryDate])})).filter(r=>r._d&&!isNaN(r._d));
+    if(dated.length>=14){
+      const mx=dated.map(r=>r._d).sort((a,b)=>b-a)[0];
+      const cut=new Date(mx); cut.setDate(cut.getDate()-7);
+      const cut2=new Date(mx); cut2.setDate(cut2.getDate()-14);
+      const tw=dated.filter(r=>r._d>=cut), lw=dated.filter(r=>r._d>=cut2&&r._d<cut);
+      if(tw.length&&lw.length) stats.weekOverWeek={thisWeek:tw.length,lastWeek:lw.length,changePercent:(((tw.length-lw.length)/lw.length)*100).toFixed(0)+'%'};
+    }
+  }
+  return stats;
 }
 
 // ─────────────────────────────────────────────────────────
-// AI — CLAUDE API WRAPPER
+// AI — CLAUDE API
 // ─────────────────────────────────────────────────────────
 async function callClaude(messages, maxTokens=800){
   if(!apiKey) throw new Error('No API key set');
   const resp = await fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
-    headers:{
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:maxTokens, messages }),
+    headers:{'x-api-key':apiKey,'anthropic-version':'2023-06-01','content-type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages}),
   });
-  if(!resp.ok){
-    let msg = `API error ${resp.status}`;
-    try{ const e=await resp.json(); msg=e.error?.message||msg; }catch(_){}
-    throw new Error(msg);
-  }
-  const data = await resp.json();
-  return data.content[0].text;
+  if(!resp.ok){ let msg=`API error ${resp.status}`; try{const e=await resp.json();msg=e.error?.message||msg;}catch(_){} throw new Error(msg); }
+  return (await resp.json()).content[0].text;
 }
 
-function safeParseJSON(text){
-  try{ return JSON.parse(text.trim().replace(/^```json?\s*/,'').replace(/```\s*$/,'')); }catch(_){ return null; }
-}
+function safeParseJSON(text){ try{return JSON.parse(text.trim().replace(/^```json?\s*/,'').replace(/```\s*$/,''));}catch(_){return null;} }
 
-// ─────────────────────────────────────────────────────────
-// AI — FEATURE 1: AUTO SUMMARY
-// ─────────────────────────────────────────────────────────
 async function generateSummary(stats){
-  const el = document.getElementById('ai-summary-body');
-  el.innerHTML = '<div class="ai-loading"><div class="mini-spin"></div>Analyzing ticket data…</div>';
+  const el=document.getElementById('ai-summary-body');
+  el.innerHTML='<div class="ai-loading"><div class="mini-spin"></div>Analyzing data…</div>';
   try{
-    const text = await callClaude([{ role:'user', content:
-      `You are an IT support analytics assistant. Write a concise 3–4 sentence plain-English summary for a manager based on these ticket stats. Highlight key metrics, top performers (if agent data available), trends, busiest periods, and concerns. Use **bold** for key numbers and names.\n\nStats:\n${JSON.stringify(stats,null,2)}`
-    }], 450);
-    const html = text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-    el.innerHTML = `<div class="ai-summary-text">${html}</div>`;
-  }catch(err){
-    el.innerHTML = `<div class="ai-error">⚠ ${err.message}</div>`;
-  }
+    const text=await callClaude([{role:'user',content:`You are a data analytics assistant. Write a concise 3–4 sentence plain-English summary for a manager based on these stats from the uploaded dataset ("${stats.filename}"). Adapt your language to the data type (IT tickets, HR records, sales data, etc.). Highlight key metrics, trends, and concerns. Use **bold** for key numbers and column names.\n\nStats:\n${JSON.stringify(stats,null,2)}`}],450);
+    el.innerHTML=`<div class="ai-summary-text">${text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>`;
+  }catch(err){el.innerHTML=`<div class="ai-error">⚠ ${err.message}</div>`;}
 }
 
-// ─────────────────────────────────────────────────────────
-// AI — FEATURE 2: ANOMALY DETECTION
-// ─────────────────────────────────────────────────────────
 async function generateAnomalies(stats){
-  const el = document.getElementById('ai-anomalies-body');
-  el.innerHTML = '<div class="ai-loading"><div class="mini-spin"></div>Detecting anomalies…</div>';
+  const el=document.getElementById('ai-anomalies-body');
+  el.innerHTML='<div class="ai-loading"><div class="mini-spin"></div>Detecting anomalies…</div>';
   try{
-    const text = await callClaude([{ role:'user', content:
-      `You are an IT support analyst. Identify 3–5 notable anomalies or patterns worth flagging. Respond with ONLY a valid JSON array, no other text or markdown fences.\n\nEach object must have:\n- "severity": "high" | "warning" | "info"\n- "message": one clear sentence including relevant numbers\n\nStats:\n${JSON.stringify(stats,null,2)}`
-    }], 500);
-    const items = safeParseJSON(text);
-    if(!Array.isArray(items)||!items.length){
-      el.innerHTML='<div class="ai-locked">✓ No notable anomalies detected in this dataset.</div>'; return;
-    }
-    el.innerHTML = `<div class="anomaly-list">${items.map(item=>`
-      <div class="anomaly-item sev-${item.severity||'warning'}">
-        <span class="anomaly-msg">${item.message||''}</span>
-        <button class="anomaly-dismiss" onclick="this.closest('.anomaly-item').remove()" title="Dismiss">✕</button>
-      </div>`).join('')}</div>`;
-  }catch(err){
-    el.innerHTML = `<div class="ai-error">⚠ ${err.message}</div>`;
-  }
+    const text=await callClaude([{role:'user',content:`You are a data analyst. Identify 3–5 notable anomalies or patterns worth flagging in this dataset. Respond with ONLY a valid JSON array.\n\nEach object: {"severity":"high"|"warning"|"info","message":"one clear sentence with numbers"}\n\nStats:\n${JSON.stringify(stats,null,2)}`}],500);
+    const items=safeParseJSON(text);
+    if(!Array.isArray(items)||!items.length){el.innerHTML='<div class="ai-locked">✓ No notable anomalies detected.</div>';return;}
+    el.innerHTML=`<div class="anomaly-list">${items.map(it=>`<div class="anomaly-item sev-${it.severity||'warning'}"><span class="anomaly-msg">${it.message||''}</span><button class="anomaly-dismiss" onclick="this.closest('.anomaly-item').remove()">✕</button></div>`).join('')}</div>`;
+  }catch(err){el.innerHTML=`<div class="ai-error">⚠ ${err.message}</div>`;}
 }
 
-// ─────────────────────────────────────────────────────────
-// AI — FEATURE 3: AGENT PERFORMANCE ANALYSIS
-// ─────────────────────────────────────────────────────────
 async function generateAgentAnalysis(stats){
-  const agentsCard = document.getElementById('ai-agents-card');
-  const el = document.getElementById('ai-agents-body');
-  if(!stats.agentStats||!stats.agentStats.length){ agentsCard.style.display='none'; return; }
-  agentsCard.style.display = '';
-  el.innerHTML = '<div class="ai-loading"><div class="mini-spin"></div>Analyzing agent performance…</div>';
+  const card=document.getElementById('ai-agents-card'), el=document.getElementById('ai-agents-body');
+  if(!stats.agentStats?.length){card.style.display='none';return;}
+  card.style.display='';
+  el.innerHTML='<div class="ai-loading"><div class="mini-spin"></div>Analyzing performance…</div>';
   try{
-    const text = await callClaude([{ role:'user', content:
-      `You are an IT team performance analyst. Analyze each agent and respond with ONLY a valid JSON array, no markdown.\n\nEach object must have:\n- "name": exact agent name\n- "status": "Overloaded" | "Balanced" | "Underutilized"\n- "recommendation": one actionable sentence\n\nTeam avg resolution: ${stats.avgResolutionHrs}h | Total tickets: ${stats.total}\nAgents:\n${JSON.stringify(stats.agentStats,null,2)}`
-    }], 700);
-    const agents = safeParseJSON(text);
-    if(!Array.isArray(agents)||!agents.length){
-      el.innerHTML='<div class="ai-error">⚠ Could not parse agent analysis</div>'; return;
-    }
-    const statsMap = Object.fromEntries((stats.agentStats||[]).map(a=>[a.name,a]));
-    el.innerHTML = `<div class="agent-grid">${agents.map(a=>{
-      const s = statsMap[a.name]||{};
-      const stCls = a.status==='Overloaded'?'st-overloaded':a.status==='Underutilized'?'st-underutilized':'st-balanced';
-      return `<div class="agent-card">
-        <div class="agent-card-name">👤 ${a.name}</div>
-        <span class="agent-status-badge ${stCls}">${a.status}</span>
-        <div class="agent-stats-row">
-          <span>Assigned</span><span class="agent-stat-val">${s.total||'—'}</span>
-          <span>Resolved</span><span class="agent-stat-val">${s.resolved||'—'}</span>
-          <span>Res. rate</span><span class="agent-stat-val">${s.resolutionRate||'—'}</span>
-          <span>Avg hrs</span><span class="agent-stat-val">${s.avgResHrs||'—'}</span>
-        </div>
-        <div class="agent-rec">${a.recommendation||''}</div>
-      </div>`;
-    }).join('')}</div>`;
-  }catch(err){
-    el.innerHTML = `<div class="ai-error">⚠ ${err.message}</div>`;
-  }
+    const text=await callClaude([{role:'user',content:`You are a team performance analyst. Analyze each person and respond with ONLY a valid JSON array.\n\nEach object: {"name":"exact name","status":"Overloaded"|"Balanced"|"Underutilized","recommendation":"one actionable sentence"}\n\nTeam data:\n${JSON.stringify(stats.agentStats,null,2)}`}],700);
+    const agents=safeParseJSON(text);
+    if(!Array.isArray(agents)||!agents.length){el.innerHTML='<div class="ai-error">⚠ Could not parse agent analysis</div>';return;}
+    const sm=Object.fromEntries((stats.agentStats||[]).map(a=>[a.name,a]));
+    el.innerHTML=`<div class="agent-grid">${agents.map(a=>{const s=sm[a.name]||{};const cls=a.status==='Overloaded'?'st-overloaded':a.status==='Underutilized'?'st-underutilized':'st-balanced';return `<div class="agent-card"><div class="agent-card-name">👤 ${a.name}</div><span class="agent-status-badge ${cls}">${a.status}</span><div class="agent-stats-row"><span>Assigned</span><span class="agent-stat-val">${s.total||'—'}</span><span>Resolved</span><span class="agent-stat-val">${s.resolved||'—'}</span><span>Rate</span><span class="agent-stat-val">${s.resolutionRate||'—'}</span><span>Avg hrs</span><span class="agent-stat-val">${s.avgResHrs||'—'}</span></div><div class="agent-rec">${a.recommendation||''}</div></div>`; }).join('')}</div>`;
+  }catch(err){el.innerHTML=`<div class="ai-error">⚠ ${err.message}</div>`;}
 }
 
-// ─────────────────────────────────────────────────────────
-// AI — FEATURE 4: SMART PREDICTIONS
-// ─────────────────────────────────────────────────────────
 async function generatePredictions(stats){
-  const el = document.getElementById('ai-predictions-body');
-  el.innerHTML = '<div class="ai-loading"><div class="mini-spin"></div>Generating predictions…</div>';
+  const el=document.getElementById('ai-predictions-body');
+  el.innerHTML='<div class="ai-loading"><div class="mini-spin"></div>Generating predictions…</div>';
   try{
-    const text = await callClaude([{ role:'user', content:
-      `You are a predictive analytics expert for IT support. Generate 3–4 forward-looking predictions based on the patterns below. Respond with ONLY a valid JSON array, no markdown fences.\n\nEach object must have:\n- "icon": one emoji\n- "prediction": one clear forward-looking sentence with numbers where possible\n- "confidence": "High confidence" | "Medium confidence" | "Based on limited data"\n\nStats:\n${JSON.stringify(stats,null,2)}`
-    }], 500);
-    const items = safeParseJSON(text);
-    if(!Array.isArray(items)||!items.length){
-      el.innerHTML='<div class="ai-locked">Not enough historical data for reliable predictions.</div>'; return;
-    }
-    el.innerHTML = `<div class="prediction-list">${items.map(p=>`
-      <div class="prediction-item">
-        <span class="pred-icon">${p.icon||'🔮'}</span>
-        <div>
-          <div class="pred-text">${p.prediction||''}</div>
-          <div class="pred-conf">${p.confidence||''}</div>
-        </div>
-      </div>`).join('')}</div>`;
-  }catch(err){
-    el.innerHTML = `<div class="ai-error">⚠ ${err.message}</div>`;
-  }
+    const text=await callClaude([{role:'user',content:`You are a predictive analytics expert. Generate 3–4 forward-looking predictions based on this data. Respond with ONLY a valid JSON array.\n\nEach object: {"icon":"emoji","prediction":"forward-looking sentence with numbers","confidence":"High confidence"|"Medium confidence"|"Based on limited data"}\n\nStats:\n${JSON.stringify(stats,null,2)}`}],500);
+    const items=safeParseJSON(text);
+    if(!Array.isArray(items)||!items.length){el.innerHTML='<div class="ai-locked">Not enough data for reliable predictions.</div>';return;}
+    el.innerHTML=`<div class="prediction-list">${items.map(p=>`<div class="prediction-item"><span class="pred-icon">${p.icon||'🔮'}</span><div><div class="pred-text">${p.prediction||''}</div><div class="pred-conf">${p.confidence||''}</div></div></div>`).join('')}</div>`;
+  }catch(err){el.innerHTML=`<div class="ai-error">⚠ ${err.message}</div>`;}
 }
 
-// ─────────────────────────────────────────────────────────
-// AI — FEATURE 5: MANAGER REPORT MODAL
-// ─────────────────────────────────────────────────────────
-function showReportModal(text){
-  document.getElementById('report-modal-body').textContent = text;
-  document.getElementById('report-modal-wrap').classList.add('on');
-}
+function showReportModal(text){ document.getElementById('report-modal-body').textContent=text; document.getElementById('report-modal-wrap').classList.add('on'); }
 
 async function generateManagerReport(stats){
-  const btn = document.getElementById('ai-report-btn');
-  btn.disabled = true; btn.textContent = '⏳ Generating…';
-  showReportModal('Generating report…\n\nPlease wait a moment.');
+  const btn=document.getElementById('ai-report-btn');
+  btn.disabled=true; btn.textContent='⏳ Generating…';
+  showReportModal('Generating report…\n\nPlease wait.');
   try{
-    const text = await callClaude([{ role:'user', content:
-      `Write a professional manager report paragraph (4–6 sentences) about this period's IT ticket performance. Include: overall team performance with specific numbers, top performer if identifiable from agent data, main bottlenecks or concerns, and 1–2 specific actionable recommendations. Tone: professional, factual, direct. Start with the date range.\n\nStats:\n${JSON.stringify(stats,null,2)}`
-    }], 450);
+    const text=await callClaude([{role:'user',content:`Write a professional manager report (4–6 sentences) about this dataset ("${stats.filename}"). Include overall performance with specific numbers, top performers if identifiable, main concerns, and 1–2 actionable recommendations. Be professional, factual, and direct.\n\nStats:\n${JSON.stringify(stats,null,2)}`}],450);
     showReportModal(text);
-  }catch(err){
-    document.getElementById('report-modal-body').textContent = `Error generating report:\n${err.message}`;
-  }finally{
-    btn.disabled = false; btn.textContent = 'Generate Report';
-  }
+  }catch(err){document.getElementById('report-modal-body').textContent=`Error: ${err.message}`;}
+  finally{btn.disabled=false; btn.textContent='Generate Report';}
 }
 
-// ─────────────────────────────────────────────────────────
-// AI — ORCHESTRATOR
-// ─────────────────────────────────────────────────────────
-let _aiStats = null;
-
-async function runAllAI(tickets){
-  _aiStats = buildTicketStats(tickets);
+async function runAllAI(rows){
+  _aiStats=buildDataStats(rows,schema);
   if(!_aiStats) return;
-
-  document.getElementById('ai-locked-state').style.display   = 'none';
-  document.getElementById('ai-summary-card').style.display   = '';
-  document.getElementById('ai-two-col-wrap').style.display   = '';
-  document.getElementById('ai-report-card').style.display    = '';
-  document.getElementById('ai-report-btn').disabled = false;
-
-  await Promise.allSettled([
-    generateSummary(_aiStats),
-    generateAnomalies(_aiStats),
-    generatePredictions(_aiStats),
-    generateAgentAnalysis(_aiStats),
-  ]);
+  document.getElementById('ai-locked-state').style.display='none';
+  document.getElementById('ai-summary-card').style.display='';
+  document.getElementById('ai-two-col-wrap').style.display='';
+  document.getElementById('ai-report-card').style.display='';
+  document.getElementById('ai-report-btn').disabled=false;
+  await Promise.allSettled([generateSummary(_aiStats),generateAnomalies(_aiStats),generatePredictions(_aiStats),generateAgentAnalysis(_aiStats)]);
 }
 
-function setupAISection(tickets){
-  const section = document.getElementById('ai-section');
-  section.style.display = '';
+function setupAISection(rows){
+  const section=document.getElementById('ai-section');
+  section.style.display='';
   if(!apiKey){
-    document.getElementById('ai-locked-state').style.display   = '';
-    document.getElementById('ai-summary-card').style.display   = 'none';
-    document.getElementById('ai-two-col-wrap').style.display   = 'none';
-    document.getElementById('ai-agents-card').style.display    = 'none';
-    document.getElementById('ai-report-card').style.display    = 'none';
+    document.getElementById('ai-locked-state').style.display='';
+    document.getElementById('ai-summary-card').style.display='none';
+    document.getElementById('ai-two-col-wrap').style.display='none';
+    document.getElementById('ai-agents-card').style.display='none';
+    document.getElementById('ai-report-card').style.display='none';
     return;
   }
-  runAllAI(tickets);
+  runAllAI(rows);
 }
 
 // ─────────────────────────────────────────────────────────
-// UPLOAD HANDLING
-// ─────────────────────────────────────────────────────────
-function openFilePicker(){
-  const inp = document.getElementById('file-input');
-  inp.value = ''; // reset before opening so the change event always fires
-  inp.click();
-}
-
-// Shared post-parse pipeline for both CSV and Excel
-function processAndLoad(headers, rows, filename){
-  if(!rows.length){ toast('File appears to be empty','error'); return; }
-  const mapping = smartAutoDetect(headers, rows);
-  currentMapping    = mapping;
-  pendingCSVHeaders = headers;
-  pendingCSVRows    = rows;
-  pendingFilename   = filename;
-  const tickets = processRows(rows, mapping);
-  if(!tickets.length){
-    toast('No parseable rows found — check the date column or try Re-map Columns','error');
-    return;
-  }
-  showMappingToast(mapping, filename, headers);
-  loadDashboard(tickets, false, filename, rows.length, headers);
-}
-
-function parseCSVFile(file){
-  showSpinner('Parsing CSV…');
-  const reader = new FileReader();
-  reader.onload = e => {
-    hideSpinner();
-    const result = Papa.parse(e.target.result, { header:true, skipEmptyLines:true, dynamicTyping:false });
-    if(!result.data.length){ toast('CSV appears to be empty','error'); return; }
-    processAndLoad(result.meta.fields || [], result.data, file.name);
-  };
-  reader.onerror = () => { hideSpinner(); toast('Could not read file','error'); };
-  reader.readAsText(file);
-}
-
-function parseExcelFile(file){
-  showSpinner('Parsing Excel…');
-  const reader = new FileReader();
-  reader.onload = e => {
-    hideSpinner();
-    try {
-      const wb = XLSX.read(e.target.result, { type:'array', raw:false });
-      if(!wb.SheetNames.length){ toast('Excel file contains no sheets','error'); return; }
-      const ws = wb.Sheets[wb.SheetNames[0]];
-
-      // Get rows as header-keyed objects; raw:false formats dates/numbers as strings
-      const rawData = XLSX.utils.sheet_to_json(ws, { defval:'', raw:false });
-      if(!rawData.length){ toast('First sheet appears to be empty','error'); return; }
-
-      const headers = Object.keys(rawData[0]);
-      // Coerce all values to strings (matches Papa Parse behaviour)
-      const rows = rawData.map(row => {
-        const out = {};
-        headers.forEach(h => { out[h] = row[h] !== undefined ? String(row[h]) : ''; });
-        return out;
-      });
-      processAndLoad(headers, rows, file.name);
-    } catch(err) {
-      toast('Could not read Excel file: ' + err.message, 'error');
-    }
-  };
-  reader.onerror = () => { hideSpinner(); toast('Could not read file','error'); };
-  reader.readAsArrayBuffer(file);
-}
-
-function handleFile(file){
-  if(!file) return;
-  const n = file.name.toLowerCase();
-  if(n.endsWith('.csv'))               parseCSVFile(file);
-  else if(n.endsWith('.xlsx') || n.endsWith('.xls')) parseExcelFile(file);
-  else toast('Please select a .csv, .xlsx, or .xls file','error');
-}
-
-function setupUpload(){
-  const zone = document.getElementById('drop-zone');
-  const inp  = document.getElementById('file-input');
-
-  zone.addEventListener('click', e => {
-    // dl-sample-btn stops propagation itself; ignore any other non-zone-level elements
-    // browse-link is intentionally NOT given its own listener — this handler covers it
-    if(e.target.id === 'dl-sample-btn') return;
-    e.stopPropagation();
-    openFilePicker();
-  });
-  document.getElementById('btn-upload-hdr').addEventListener('click', () => {
-    document.getElementById('upload-wrap').style.display = '';
-    document.getElementById('upload-wrap').scrollIntoView({behavior:'smooth'});
-    openFilePicker();
-  });
-  document.getElementById('demo-upload-btn').addEventListener('click', openFilePicker);
-  // Guard prevents double-firing if both 'change' and 'input' trigger for the same selection
-  let _filePickBusy = false;
-  function onFileChosen(){
-    if(_filePickBusy) return;
-    const file = inp.files && inp.files[0];
-    if(!file) return;
-    _filePickBusy = true;
-    handleFile(file);
-    inp.value = ''; // reset so re-selecting the same file always fires the event
-    requestAnimationFrame(() => { _filePickBusy = false; });
-  }
-  inp.addEventListener('change', onFileChosen);
-  inp.addEventListener('input',  onFileChosen); // fallback for browsers that skip 'change'
-
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault(); zone.classList.remove('over');
-    handleFile(e.dataTransfer.files[0]);
-  });
-
-  document.getElementById('mapper-close').addEventListener('click', closeMapper);
-  document.getElementById('mapper-apply').addEventListener('click', applyMapper);
-
-  document.getElementById('btn-remap').addEventListener('click', () => {
-    if(pendingCSVHeaders.length) openMapper(pendingCSVHeaders, pendingCSVRows, pendingFilename, currentMapping);
-    else toast('No CSV loaded yet','error');
-  });
-  document.getElementById('btn-change-file').addEventListener('click', () => {
-    document.getElementById('upload-wrap').style.display = '';
-    openFilePicker();
-  });
-
-  document.getElementById('btn-pdf').addEventListener('click', downloadPDF);
-  document.getElementById('dl-sample-btn').addEventListener('click', e => { e.stopPropagation(); downloadSampleCSV(); });
-
-  // Filter controls
-  document.getElementById('btn-apply-filters').addEventListener('click', applyFilters);
-  document.getElementById('btn-reset-filters').addEventListener('click', resetFilters);
-  // Apply on Enter key inside date pickers
-  ['f-date-from','f-date-to'].forEach(id =>
-    document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') applyFilters(); })
-  );
-
-  // AI key bar
-  document.getElementById('ai-key-save').addEventListener('click', saveApiKey);
-  document.getElementById('ai-key-clear').addEventListener('click', clearApiKey);
-  document.getElementById('ai-key-input').addEventListener('keydown', e => { if(e.key==='Enter') saveApiKey(); });
-
-  // Regenerate insights
-  document.getElementById('ai-regen-btn').addEventListener('click', () => {
-    if(apiKey && !isDemo && currentTickets.length) runAllAI(currentTickets);
-    else if(!apiKey) toast('Enter your API key first','error');
-  });
-
-  // Manager report button (onclick set dynamically in runAllAI, fallback here)
-  document.getElementById('ai-report-btn').addEventListener('click', () => {
-    if(_aiStats) generateManagerReport(_aiStats);
-  });
-
-  // Report modal close / copy
-  document.getElementById('report-close-x').addEventListener('click', () =>
-    document.getElementById('report-modal-wrap').classList.remove('on'));
-  document.getElementById('report-close-btn').addEventListener('click', () =>
-    document.getElementById('report-modal-wrap').classList.remove('on'));
-  document.getElementById('report-modal-wrap').addEventListener('click', e => {
-    if(e.target === document.getElementById('report-modal-wrap'))
-      document.getElementById('report-modal-wrap').classList.remove('on');
-  });
-  document.getElementById('report-copy-btn').addEventListener('click', () => {
-    const text = document.getElementById('report-modal-body').textContent;
-    navigator.clipboard.writeText(text).then(
-      () => toast('Report copied to clipboard','success'),
-      () => toast('Copy failed — select the text manually','error')
-    );
-  });
-}
-
-// ─────────────────────────────────────────────────────────
-// SAMPLE CSV DOWNLOAD
+// SAMPLE CSV
 // ─────────────────────────────────────────────────────────
 function downloadSampleCSV(){
-  const hdr = ['ticket_id','date','category','priority','status','resolution_time_hours'];
-  const rows = DEMO_RAW.map(r => r.join(','));
-  const csv = [hdr.join(','), ...rows].join('\n');
-  const url = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  const a = Object.assign(document.createElement('a'),{href:url,download:'sample-tickets.csv'});
-  a.click();
-  URL.revokeObjectURL(url);
+  const csv=`ID,Created Date,Closed Date,Title,Assigned To,State,Application,Priority,Region,Hours
+TKT-001,1/4/2026 9:00:00 am,3/4/2026 2:30:00 pm,Login page not loading,Sarah Johnson <sarah@corp.com>,Resolved,Customer Portal,High,APAC,53.5
+TKT-002,2/4/2026 11:15:00 am,,Database connection timeout,Mike Chen <mike@corp.com>,Active,Core Banking,Critical,EMEA,
+TKT-003,3/4/2026 10:30:00 am,4/4/2026 11:00:00 am,Password reset not working,Priya Sharma <priya@corp.com>,Resolved,Identity Service,Medium,NAM,24.5
+TKT-004,4/4/2026 2:15:00 pm,,Slow report generation,David Okonkwo <david@corp.com>,In Progress,Reporting Suite,Low,APAC,
+TKT-005,5/4/2026 9:45:00 am,6/4/2026 3:00:00 pm,Email alerts not firing,Sarah Johnson <sarah@corp.com>,Resolved,Notification Engine,High,EMEA,29.25
+TKT-006,5/4/2026 11:00:00 am,,API gateway 502 errors,Mike Chen <mike@corp.com>,Active,API Gateway,Critical,NAM,
+TKT-007,6/4/2026 8:30:00 am,7/4/2026 10:00:00 am,User import failing,Priya Sharma <priya@corp.com>,Resolved,Identity Service,Medium,APAC,25.5
+TKT-008,7/4/2026 10:00:00 am,,Dashboard charts not loading,Aisha Patel <aisha@corp.com>,Pending,Reporting Suite,Low,EMEA,
+TKT-009,7/4/2026 3:00:00 pm,9/4/2026 9:00:00 am,SSO redirect loop,David Okonkwo <david@corp.com>,Resolved,Identity Service,High,NAM,42.0
+TKT-010,8/4/2026 9:15:00 am,,Notification emails delayed,Sarah Johnson <sarah@corp.com>,Active,Notification Engine,Medium,APAC,
+TKT-011,9/4/2026 10:30:00 am,10/4/2026 2:00:00 pm,File upload 500 error,Mike Chen <mike@corp.com>,Resolved,Customer Portal,High,EMEA,27.5
+TKT-012,10/4/2026 9:00:00 am,,Memory leak in scheduler,Priya Sharma <priya@corp.com>,In Progress,Core Banking,Critical,NAM,
+TKT-013,10/4/2026 11:45:00 am,11/4/2026 4:00:00 pm,Search returning wrong results,Aisha Patel <aisha@corp.com>,Resolved,Customer Portal,Medium,APAC,28.25
+TKT-014,11/4/2026 2:00:00 pm,,Bulk export times out,David Okonkwo <david@corp.com>,Pending,Reporting Suite,Low,EMEA,
+TKT-015,12/4/2026 9:30:00 am,13/4/2026 11:00:00 am,Mobile app crash on login,Sarah Johnson <sarah@corp.com>,Resolved,Customer Portal,High,NAM,25.5
+TKT-016,13/4/2026 10:00:00 am,,Webhook delivery failures,Mike Chen <mike@corp.com>,Active,API Gateway,High,APAC,
+TKT-017,14/4/2026 9:00:00 am,15/4/2026 3:30:00 pm,Incorrect balance displayed,Priya Sharma <priya@corp.com>,Resolved,Core Banking,Critical,EMEA,54.5
+TKT-018,14/4/2026 11:30:00 am,,Two-factor auth not sending,Aisha Patel <aisha@corp.com>,Active,Identity Service,High,NAM,
+TKT-019,15/4/2026 2:00:00 pm,16/4/2026 10:00:00 am,Report PDF export blank,David Okonkwo <david@corp.com>,Resolved,Reporting Suite,Medium,APAC,20.0
+TKT-020,16/4/2026 9:00:00 am,,Payment processing timeout,Sarah Johnson <sarah@corp.com>,Active,Core Banking,Critical,EMEA,`;
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  const a=Object.assign(document.createElement('a'),{href:url,download:'sample-data.csv'});
+  a.click(); URL.revokeObjectURL(url);
   toast('Sample CSV downloaded','success');
 }
 
@@ -2148,57 +1392,104 @@ function downloadSampleCSV(){
 // PDF EXPORT
 // ─────────────────────────────────────────────────────────
 async function downloadPDF(){
-  const btn = document.getElementById('btn-pdf');
-  btn.disabled = true;
-  btn.querySelector('span:last-child').textContent = 'Generating…';
+  const btn=document.getElementById('btn-pdf');
+  btn.disabled=true; btn.querySelector('span:last-child').textContent='Generating…';
   showSpinner('Generating PDF…');
-
-  try {
-    await new Promise(r => setTimeout(r, 200));
-    const el = document.getElementById('printable');
-    const canvas = await html2canvas(el, {
-      scale: 1.8,
-      backgroundColor: '#0a0e1a',
-      useCORS: true,
-      logging: false,
-      allowTaint: true,
-    });
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p','mm','a4');
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    const imgW = pageW;
-    const imgH = (canvas.height / canvas.width) * imgW;
-    const imgData = canvas.toDataURL('image/jpeg', 0.88);
-
-    let heightLeft = imgH;
-    let pos = 0;
-    pdf.addImage(imgData,'JPEG',0,pos,imgW,imgH);
-    heightLeft -= pageH;
-    while(heightLeft > 0){
-      pos -= pageH;
-      pdf.addPage();
-      pdf.addImage(imgData,'JPEG',0,pos,imgW,imgH);
-      heightLeft -= pageH;
-    }
-    pdf.save('IT-Support-Analytics.pdf');
+  try{
+    await new Promise(r=>setTimeout(r,200));
+    const el=document.getElementById('printable');
+    const canvas=await html2canvas(el,{scale:1.8,backgroundColor:'#0a0e1a',useCORS:true,logging:false,allowTaint:true});
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF('p','mm','a4');
+    const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+    const imgH=(canvas.height/canvas.width)*pw;
+    const imgData=canvas.toDataURL('image/jpeg',.88);
+    let left=imgH, pos=0;
+    pdf.addImage(imgData,'JPEG',0,pos,pw,imgH); left-=ph;
+    while(left>0){ pos-=ph; pdf.addPage(); pdf.addImage(imgData,'JPEG',0,pos,pw,imgH); left-=ph; }
+    pdf.save(`${currentFilename.replace(/\.\w+$/,'')}-dashboard.pdf`);
     toast('PDF downloaded','success');
-  } catch(err){
-    toast('PDF generation failed: '+err.message,'error');
-  } finally {
-    hideSpinner();
-    btn.disabled = false;
-    btn.querySelector('span:last-child').textContent = 'Export PDF';
-  }
+  }catch(err){toast('PDF failed: '+err.message,'error');}
+  finally{hideSpinner();btn.disabled=false;btn.querySelector('span:last-child').textContent='Export PDF';}
 }
 
 // ─────────────────────────────────────────────────────────
 // INIT
 // ─────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  setupUpload();
-  loadDashboard(DEMO_TICKETS, true, 'demo', 50);
+document.addEventListener('DOMContentLoaded',()=>{
+  const inp=document.getElementById('file-input');
+  const zone=document.getElementById('drop-zone');
+
+  // Drop zone click (upload screen)
+  zone.addEventListener('click',e=>{
+    if(e.target.id==='dl-sample-btn') return;
+    e.stopPropagation();
+    openFilePicker();
+  });
+
+  // Header upload button
+  document.getElementById('btn-upload-hdr').addEventListener('click',openFilePicker);
+
+  // Source bar buttons
+  document.getElementById('btn-view-cols').addEventListener('click',()=>{
+    if(rawRows.length&&schema) showPreview(rawHeaders,rawRows,schema,currentFilename);
+    else toast('No file loaded','error');
+  });
+  document.getElementById('btn-change-file').addEventListener('click',openFilePicker);
+
+  // File input (with double-pick guard)
+  let _busy=false;
+  function onFileChosen(){
+    if(_busy) return;
+    const file=inp.files&&inp.files[0];
+    if(!file) return;
+    _busy=true;
+    handleFile(file);
+    inp.value='';
+    requestAnimationFrame(()=>{ _busy=false; });
+  }
+  inp.addEventListener('change',onFileChosen);
+  inp.addEventListener('input',onFileChosen);
+
+  // Drag & drop
+  zone.addEventListener('dragover',e=>{ e.preventDefault(); zone.classList.add('over'); });
+  zone.addEventListener('dragleave',()=>zone.classList.remove('over'));
+  zone.addEventListener('drop',e=>{ e.preventDefault(); zone.classList.remove('over'); handleFile(e.dataTransfer.files[0]); });
+
+  // Sample CSV
+  document.getElementById('dl-sample-btn').addEventListener('click',e=>{ e.stopPropagation(); downloadSampleCSV(); });
+
+  // Preview modal
+  document.getElementById('preview-confirm-btn').addEventListener('click',confirmLoad);
+  document.getElementById('preview-cancel-btn').addEventListener('click',closePreview);
+
+  // PDF
+  document.getElementById('btn-pdf').addEventListener('click',downloadPDF);
+
+  // AI key bar
+  document.getElementById('ai-key-save').addEventListener('click',saveApiKey);
+  document.getElementById('ai-key-clear').addEventListener('click',clearApiKey);
+  document.getElementById('ai-key-input').addEventListener('keydown',e=>{ if(e.key==='Enter') saveApiKey(); });
+
+  // AI regen
+  document.getElementById('ai-regen-btn').addEventListener('click',()=>{
+    if(apiKey&&rawRows.length) runAllAI(filteredRows.length?filteredRows:rawRows);
+    else if(!apiKey) toast('Enter your API key first','error');
+  });
+
+  // Manager report
+  document.getElementById('ai-report-btn').addEventListener('click',()=>{ if(_aiStats) generateManagerReport(_aiStats); });
+
+  // Report modal
+  document.getElementById('report-close-x').addEventListener('click',()=>document.getElementById('report-modal-wrap').classList.remove('on'));
+  document.getElementById('report-close-btn').addEventListener('click',()=>document.getElementById('report-modal-wrap').classList.remove('on'));
+  document.getElementById('report-modal-wrap').addEventListener('click',e=>{ if(e.target===document.getElementById('report-modal-wrap')) document.getElementById('report-modal-wrap').classList.remove('on'); });
+  document.getElementById('report-copy-btn').addEventListener('click',()=>{
+    navigator.clipboard.writeText(document.getElementById('report-modal-body').textContent).then(
+      ()=>toast('Copied to clipboard','success'),
+      ()=>toast('Copy failed — select text manually','error')
+    );
+  });
 });
 </script>
 </body>
