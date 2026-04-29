@@ -100,8 +100,18 @@ header p{font-size:.73rem;color:var(--muted);margin-top:1px}
 
 /* ── Filter bar ── */
 #filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px}
-.filter-hdr{display:flex;align-items:center;gap:7px;margin-bottom:12px;font-size:.8rem;font-weight:700;color:var(--muted)}
+.filter-hdr{display:flex;align-items:center;gap:8px;margin-bottom:0}
+.filter-toggle-btn{background:none;border:none;color:var(--text);font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;padding:0;white-space:nowrap}
+.filter-toggle-btn:hover{color:var(--accent)}
+.filter-arrow{display:inline-block;transition:transform .22s;font-size:.7rem;color:var(--muted)}
+.filter-arrow.closed{transform:rotate(-90deg)}
 #filter-badge{background:var(--accent);color:#fff;border-radius:20px;padding:1px 8px;font-size:.65rem;font-weight:800;display:none}
+.filter-hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#filter-record-count{font-size:.74rem;color:var(--muted);font-weight:600;white-space:nowrap}
+.btn-clear-all{color:var(--red)!important;border-color:rgba(239,68,68,.4)!important}
+.btn-clear-all:hover{background:rgba(239,68,68,.1)!important}
+.filter-body{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.filter-body.closed{display:none}
 .filter-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
 .filter-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:110px;max-width:200px}
 .filter-group label{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
@@ -109,9 +119,43 @@ header p{font-size:.73rem;color:var(--muted);margin-top:1px}
 .filter-input:focus,.filter-select:focus{border-color:var(--accent)}
 .filter-input[type="date"]{color-scheme:dark}
 .filter-input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5) brightness(1.5);cursor:pointer}
-.filter-actions{display:flex;gap:8px;align-items:flex-end;flex-shrink:0;padding-bottom:0}
-#filter-summary{margin-top:11px;padding-top:11px;border-top:1px solid var(--border);display:none;align-items:center;gap:8px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
-.filter-tag{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(99,102,241,.3);padding:3px 10px;border-radius:20px;font-size:.71rem;font-weight:600}
+#dynamic-filter-rows{display:flex;flex-direction:column;gap:8px}
+.dyn-filter-row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.dyn-filter-widget{position:relative;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.filter-widget-remove{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--surface3);border:1px solid var(--border2);color:var(--muted);font-size:.6rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;padding:0;line-height:1}
+.filter-widget-remove:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.range-inputs{display:flex;gap:6px;align-items:center}
+.range-inputs .filter-input{width:90px!important;min-width:60px}
+.range-sep{font-size:.7rem;color:var(--muted2);flex-shrink:0}
+.filter-actions-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn-add-filter{border-style:dashed;color:var(--accent);border-color:rgba(99,102,241,.4);background:transparent;display:none}
+.btn-add-filter:hover{background:var(--accent-dim);border-color:var(--accent)}
+.add-filter-wrap{position:relative}
+.add-filter-panel{position:absolute;top:calc(100% + 6px);left:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);min-width:240px;max-height:260px;overflow-y:auto;z-index:500;box-shadow:0 8px 28px rgba(0,0,0,.45);display:none}
+.add-filter-panel.open{display:block}
+.afp-hdr{padding:7px 12px;font-size:.67rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted2);border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface2)}
+.afp-item{display:flex;align-items:center;gap:9px;padding:9px 14px;cursor:pointer;font-size:.82rem;transition:background .12s;white-space:nowrap}
+.afp-item:hover{background:var(--surface3)}
+.afp-icon{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
+.afp-name{font-weight:600;color:var(--text);flex:1}
+.afp-type{font-size:.64rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.4px;flex-shrink:0}
+.afp-empty{padding:14px;font-size:.8rem;color:var(--muted2);text-align:center}
+#filter-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;align-items:center}
+#filter-pills:empty{margin-top:0}
+.filter-pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;border:1px solid rgba(99,102,241,.35);background:var(--accent-dim);color:#a5b4fc;max-width:300px;flex-shrink:0}
+.pill-col{opacity:.6;font-weight:400;font-size:.64rem}
+.pill-val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+.pill-x{background:none;border:none;color:inherit;cursor:pointer;font-size:.78rem;padding:0;margin-left:3px;opacity:.7;line-height:1;flex-shrink:0}
+.pill-x:hover{opacity:1}
+.pill-date{background:rgba(6,182,212,.1);color:var(--cyan);border-color:rgba(6,182,212,.3)}
+.pill-num{background:rgba(249,115,22,.1);color:var(--orange);border-color:rgba(249,115,22,.3)}
+.pill-text{background:rgba(16,185,129,.1);color:var(--green);border-color:rgba(16,185,129,.3)}
+.filter-presets-row{display:none;align-items:center;gap:8px;flex-wrap:wrap;padding-top:4px}
+.presets-label{font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted2);flex-shrink:0}
+.preset-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:.73rem;font-weight:600;background:var(--surface2);border:1px solid var(--border2);color:var(--text);cursor:pointer;transition:all .15s;white-space:nowrap}
+.preset-btn:hover{background:var(--surface3);border-color:var(--accent)}
+.preset-del{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:.68rem;padding:0;margin-left:2px;line-height:1}
+.preset-del:hover{color:var(--red)}
 
 /* ── AI Key Bar ── */
 #ai-key-bar{background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.07));border-bottom:1px solid rgba(99,102,241,.22);padding:12px 28px}
@@ -344,9 +388,35 @@ tbody td{padding:10px 14px;white-space:nowrap;max-width:280px;overflow:hidden;te
   </div>
 
   <div id="filter-bar">
-    <div class="filter-hdr">🔍 Filters <span id="filter-badge"></span></div>
-    <div class="filter-row" id="filter-row"></div>
-    <div id="filter-summary"></div>
+    <div class="filter-hdr">
+      <button class="filter-toggle-btn" id="filter-toggle-btn">
+        <span class="filter-arrow" id="filter-arrow">▼</span>
+        <span id="filter-toggle-label">🔍 Filters</span>
+        <span id="filter-badge"></span>
+      </button>
+      <div class="filter-hdr-right">
+        <span id="filter-record-count"></span>
+        <button id="btn-save-preset" class="btn-sm" style="display:none">💾 Save Preset</button>
+        <button id="btn-clear-all" class="btn-sm btn-clear-all" style="display:none">✕ Clear All</button>
+      </div>
+    </div>
+    <div id="filter-body" class="filter-body">
+      <div class="filter-row" id="filter-row"></div>
+      <div id="dynamic-filter-rows"></div>
+      <div class="filter-actions-row">
+        <button class="btn btn-primary" id="btn-apply-filters">Apply</button>
+        <button class="btn" id="btn-reset-filters">↺ Reset</button>
+        <div class="add-filter-wrap">
+          <button class="btn btn-add-filter" id="btn-add-filter">+ Add Filter</button>
+          <div id="add-filter-panel" class="add-filter-panel"></div>
+        </div>
+      </div>
+      <div id="filter-presets-row" class="filter-presets-row">
+        <span class="presets-label">⚡ Presets:</span>
+        <div id="filter-presets" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+      </div>
+    </div>
+    <div id="filter-pills"></div>
   </div>
 
   <div id="ai-key-bar">
@@ -460,6 +530,9 @@ let apiKey = '';
 let currentFilename = '';
 let _aiStats = null;
 const charts = {};
+let addedFilterCols = new Set();
+let filterPresets = [];
+let _pillClearFns = [];
 
 // ─────────────────────────────────────────────────────────
 // CHART DEFAULTS
@@ -863,7 +936,13 @@ function buildKPIs(rows, sch){
 // ─────────────────────────────────────────────────────────
 // FILTER BAR
 // ─────────────────────────────────────────────────────────
+// ── Filter helpers ──────────────────────────────────────────
+function escAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
 function buildFilters(sch){
+  addedFilterCols.clear();
+  document.getElementById('dynamic-filter-rows').innerHTML='';
+
   const row = document.getElementById('filter-row');
   const groups = [];
 
@@ -873,104 +952,388 @@ function buildFilters(sch){
     const mx = dates.length ? toDateKey(dates[dates.length-1]) : '';
     groups.push(`
       <div class="filter-group">
-        <label>From Date</label>
+        <label>From (${sch.primaryDate})</label>
         <input type="date" class="filter-input" id="f-date-from" min="${mn}" max="${mx}">
       </div>
       <div class="filter-group">
         <label>To Date</label>
         <input type="date" class="filter-input" id="f-date-to" min="${mn}" max="${mx}">
       </div>`);
+    addedFilterCols.add(sch.primaryDate);
+    if(sch.secondaryDate) addedFilterCols.add(sch.secondaryDate);
   }
 
-  const filterCols = [sch.statusCol, sch.agentCol, sch.priorityCol, ...(sch.categoricalCols||[]).slice(0,2)].filter(Boolean);
-  filterCols.forEach(col=>{
+  const autoCols = [sch.statusCol, sch.agentCol, sch.priorityCol, ...(sch.categoricalCols||[]).slice(0,2)].filter(Boolean);
+  autoCols.forEach(col=>{
     const isAgent = col===sch.agentCol;
     const vals = [...new Set(rawRows.map(r=>{ let v=String(r[col]||'').trim(); if(isAgent) v=cleanAgentName(v); return v; }).filter(Boolean))].sort();
-    if(vals.length<2||vals.length>60) return;
+    if(vals.length<2||vals.length>80) return;
     groups.push(`
       <div class="filter-group">
         <label>${col}</label>
-        <select class="filter-select dyn-filter" data-col="${col.replace(/"/g,'&quot;')}" data-isagent="${isAgent}">
-          <option value="">All ${col}</option>
-          ${vals.map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('')}
+        <select class="filter-select dyn-filter" data-col="${escAttr(col)}" data-isagent="${isAgent}">
+          <option value="">All</option>
+          ${vals.map(v=>`<option value="${escAttr(v)}">${v}</option>`).join('')}
         </select>
       </div>`);
+    addedFilterCols.add(col);
   });
-
-  groups.push(`
-    <div class="filter-actions">
-      <button class="btn btn-primary" id="btn-apply-filters">Apply Filters</button>
-      <button class="btn" id="btn-reset-filters">Reset</button>
-    </div>`);
 
   row.innerHTML = groups.join('');
 
+  document.getElementById('btn-add-filter').style.display='';
+  updateAddFilterPanel(sch);
+
   document.getElementById('btn-apply-filters').addEventListener('click', applyFilters);
-  document.getElementById('btn-reset-filters').addEventListener('click', resetFilters);
-  if(sch.primaryDate){
-    ['f-date-from','f-date-to'].forEach(id=>{
-      document.getElementById(id)?.addEventListener('keydown', e=>{ if(e.key==='Enter') applyFilters(); });
-    });
+  document.getElementById('btn-reset-filters').addEventListener('click', ()=>resetFilters());
+  document.getElementById('btn-clear-all').addEventListener('click', clearAllFilters);
+  document.getElementById('btn-save-preset').addEventListener('click', openSavePresetForm);
+  ['f-date-from','f-date-to'].forEach(id=>{
+    document.getElementById(id)?.addEventListener('keydown', e=>{ if(e.key==='Enter') applyFilters(); });
+  });
+}
+
+function updateAddFilterPanel(sch){
+  const panel = document.getElementById('add-filter-panel');
+  const remaining = (sch.cols||[]).filter(c=>!addedFilterCols.has(c.header)&&c.type!=='id');
+  if(!remaining.length){
+    panel.innerHTML='<div class="afp-hdr">Add column filter</div><div class="afp-empty">All columns already added</div>';
+    return;
   }
+  panel.innerHTML=`<div class="afp-hdr">Select a column</div>${remaining.map(c=>`
+    <div class="afp-item" data-add-col="${escAttr(c.header)}">
+      <span class="afp-icon">${TYPE_ICONS[c.type]||'📊'}</span>
+      <span class="afp-name">${c.header}</span>
+      <span class="afp-type">${TYPE_LABELS[c.type]||c.type}</span>
+    </div>`).join('')}`;
+  panel.querySelectorAll('.afp-item').forEach(item=>{
+    item.addEventListener('click',()=>{
+      addDynamicFilter(item.dataset.addCol);
+      panel.classList.remove('open');
+    });
+  });
+}
+
+function addDynamicFilter(colHeader){
+  if(addedFilterCols.has(colHeader)) return;
+  addedFilterCols.add(colHeader);
+
+  const colInfo = schema.cols.find(c=>c.header===colHeader);
+  const type = colInfo ? colInfo.type : 'category';
+  const sa = escAttr(colHeader);
+  let inputHTML = '';
+
+  if(type==='date'){
+    const dates = rawRows.map(r=>parseDate(r[colHeader])).filter(d=>d&&!isNaN(d)).sort((a,b)=>a-b);
+    const mn = dates.length?toDateKey(dates[0]):'';
+    const mx = dates.length?toDateKey(dates[dates.length-1]):'';
+    inputHTML=`
+      <div class="filter-group">
+        <label>From (${colHeader})</label>
+        <input type="date" class="filter-input dyn-date-from" data-col="${sa}" min="${mn}" max="${mx}">
+      </div>
+      <div class="filter-group">
+        <label>To (${colHeader})</label>
+        <input type="date" class="filter-input dyn-date-to" data-col="${sa}" min="${mn}" max="${mx}">
+      </div>`;
+  } else if(type==='number'){
+    const nums = rawRows.map(r=>parseFloat(String(r[colHeader]||'').replace(/[,$%\s]/g,''))).filter(n=>!isNaN(n));
+    const mn = nums.length?Math.floor(Math.min(...nums)):0;
+    const mx = nums.length?Math.ceil(Math.max(...nums)):100;
+    inputHTML=`
+      <div class="filter-group" style="max-width:270px">
+        <label>${colHeader} (${mn} – ${mx})</label>
+        <div class="range-inputs">
+          <input type="number" class="filter-input dyn-num-min" data-col="${sa}" placeholder="Min">
+          <span class="range-sep">–</span>
+          <input type="number" class="filter-input dyn-num-max" data-col="${sa}" placeholder="Max">
+        </div>
+      </div>`;
+  } else if(type==='text'){
+    inputHTML=`
+      <div class="filter-group" style="max-width:260px">
+        <label>Search: ${colHeader}</label>
+        <input type="text" class="filter-input dyn-text-search" data-col="${sa}" placeholder="Type to filter…">
+      </div>`;
+  } else {
+    const isAgent = type==='agent';
+    const vals = [...new Set(rawRows.map(r=>{ let v=String(r[colHeader]||'').trim(); if(isAgent)v=cleanAgentName(v); return v; }).filter(Boolean))].sort();
+    const limit = vals.length>30 ? vals.slice(0,30) : vals;
+    inputHTML=`
+      <div class="filter-group">
+        <label>${colHeader}</label>
+        <select class="filter-select dyn-filter" data-col="${sa}" data-isagent="${isAgent}">
+          <option value="">All</option>
+          ${limit.map(v=>`<option value="${escAttr(v)}">${v}</option>`).join('')}
+        </select>
+      </div>`;
+  }
+
+  const rowDiv = document.createElement('div');
+  rowDiv.className='dyn-filter-row';
+  rowDiv.dataset.filterCol=colHeader;
+  rowDiv.innerHTML=`<div class="dyn-filter-widget">
+    ${inputHTML}
+    <button class="filter-widget-remove" data-remove-col="${sa}" title="Remove filter">✕</button>
+  </div>`;
+  document.getElementById('dynamic-filter-rows').appendChild(rowDiv);
+  updateAddFilterPanel(schema);
+  toast(`Filter added: ${colHeader}`,'info');
+}
+
+function removeDynamicFilter(colHeader){
+  addedFilterCols.delete(colHeader);
+  document.getElementById('dynamic-filter-rows').querySelectorAll('.dyn-filter-row').forEach(r=>{
+    if(r.dataset.filterCol===colHeader) r.remove();
+  });
+  updateAddFilterPanel(schema);
+  applyFilters();
 }
 
 function applyFilters(){
   let result = [...rawRows];
-  let activeCount = 0;
 
-  const fromEl = document.getElementById('f-date-from');
-  const toEl   = document.getElementById('f-date-to');
-  if(fromEl?.value){
-    const from = new Date(fromEl.value); from.setHours(0,0,0,0);
-    result = result.filter(r=>{ const d=parseDate(r[schema.primaryDate]); return d&&!isNaN(d)&&d>=from; });
-    activeCount++;
-  }
-  if(toEl?.value){
-    const to = new Date(toEl.value); to.setHours(23,59,59,999);
-    result = result.filter(r=>{ const d=parseDate(r[schema.primaryDate]); return d&&!isNaN(d)&&d<=to; });
-    activeCount++;
-  }
+  const fromEl=document.getElementById('f-date-from');
+  const toEl=document.getElementById('f-date-to');
+  if(fromEl?.value){ const from=new Date(fromEl.value); from.setHours(0,0,0,0);
+    result=result.filter(r=>{ const d=parseDate(r[schema.primaryDate]); return d&&!isNaN(d)&&d>=from; }); }
+  if(toEl?.value){ const to=new Date(toEl.value); to.setHours(23,59,59,999);
+    result=result.filter(r=>{ const d=parseDate(r[schema.primaryDate]); return d&&!isNaN(d)&&d<=to; }); }
 
   document.querySelectorAll('.dyn-filter').forEach(sel=>{
-    const col = sel.dataset.col;
-    const isAgent = sel.dataset.isagent==='true';
-    const val = sel.value;
-    if(val){
-      result = result.filter(r=>{ let v=String(r[col]||'').trim(); if(isAgent) v=cleanAgentName(v); return v===val; });
-      activeCount++;
-    }
+    const col=sel.dataset.col, isAgent=sel.dataset.isagent==='true', val=sel.value;
+    if(val) result=result.filter(r=>{ let v=String(r[col]||'').trim(); if(isAgent)v=cleanAgentName(v); return v===val; });
+  });
+  document.querySelectorAll('.dyn-date-from').forEach(el=>{
+    if(el.value){ const c=el.dataset.col, from=new Date(el.value); from.setHours(0,0,0,0);
+      result=result.filter(r=>{ const d=parseDate(r[c]); return d&&!isNaN(d)&&d>=from; }); }
+  });
+  document.querySelectorAll('.dyn-date-to').forEach(el=>{
+    if(el.value){ const c=el.dataset.col, to=new Date(el.value); to.setHours(23,59,59,999);
+      result=result.filter(r=>{ const d=parseDate(r[c]); return d&&!isNaN(d)&&d<=to; }); }
+  });
+  document.querySelectorAll('.dyn-num-min').forEach(el=>{
+    if(el.value!==''){ const mn=parseFloat(el.value),c=el.dataset.col;
+      result=result.filter(r=>{ const n=parseFloat(String(r[c]||'').replace(/[,$%\s]/g,'')); return !isNaN(n)&&n>=mn; }); }
+  });
+  document.querySelectorAll('.dyn-num-max').forEach(el=>{
+    if(el.value!==''){ const mx=parseFloat(el.value),c=el.dataset.col;
+      result=result.filter(r=>{ const n=parseFloat(String(r[c]||'').replace(/[,$%\s]/g,'')); return !isNaN(n)&&n<=mx; }); }
+  });
+  document.querySelectorAll('.dyn-text-search').forEach(el=>{
+    const q=el.value.trim().toLowerCase(),c=el.dataset.col;
+    if(q) result=result.filter(r=>String(r[c]||'').toLowerCase().includes(q));
   });
 
-  const badge = document.getElementById('filter-badge');
-  badge.textContent = activeCount;
-  badge.style.display = activeCount ? '' : 'none';
-  filteredRows = result;
+  filteredRows=result;
   renderAll(filteredRows);
+  updateFilterPills();
+  updateFilterBadge();
 }
 
-function resetFilters(){
-  const fromEl = document.getElementById('f-date-from');
-  const toEl   = document.getElementById('f-date-to');
+function resetFilters(silent=false){
+  const fromEl=document.getElementById('f-date-from');
+  const toEl=document.getElementById('f-date-to');
   if(fromEl) fromEl.value='';
   if(toEl)   toEl.value='';
   document.querySelectorAll('.dyn-filter').forEach(s=>s.value='');
-  document.getElementById('filter-badge').style.display='none';
-  filteredRows = [...rawRows];
-  renderAll(filteredRows);
+  document.querySelectorAll('.dyn-date-from,.dyn-date-to,.dyn-num-min,.dyn-num-max,.dyn-text-search').forEach(el=>el.value='');
+  if(!silent){
+    filteredRows=[...rawRows];
+    renderAll(filteredRows);
+    updateFilterPills();
+    updateFilterBadge();
+  }
 }
 
-function updateFilterSummary(rows){
-  const summary = document.getElementById('filter-summary');
-  const active = [];
-  const fromEl = document.getElementById('f-date-from');
-  const toEl   = document.getElementById('f-date-to');
-  if(fromEl?.value) active.push(`From: ${fromEl.value}`);
-  if(toEl?.value)   active.push(`To: ${toEl.value}`);
-  document.querySelectorAll('.dyn-filter').forEach(s=>{ if(s.value) active.push(`${s.dataset.col}: ${s.value}`); });
+function clearAllFilters(){
+  document.getElementById('dynamic-filter-rows').innerHTML='';
+  // Rebuild addedFilterCols to only the auto-added ones
+  addedFilterCols.clear();
+  if(schema){
+    if(schema.primaryDate) addedFilterCols.add(schema.primaryDate);
+    if(schema.secondaryDate) addedFilterCols.add(schema.secondaryDate);
+    document.querySelectorAll('#filter-row .dyn-filter').forEach(sel=>addedFilterCols.add(sel.dataset.col));
+    updateAddFilterPanel(schema);
+  }
+  resetFilters();
+}
 
-  if(!active.length){ summary.style.display='none'; return; }
-  summary.innerHTML = `Showing <strong>${rows.length.toLocaleString()}</strong> of <strong>${rawRows.length.toLocaleString()}</strong> records &nbsp;·&nbsp; ${active.map(a=>`<span class="filter-tag">${a}</span>`).join('')}`;
-  summary.style.display='flex';
+function updateFilterPills(){
+  _pillClearFns=[];
+  const container=document.getElementById('filter-pills');
+  const pills=[];
+
+  const fromEl=document.getElementById('f-date-from');
+  const toEl=document.getElementById('f-date-to');
+  if(fromEl?.value||toEl?.value){
+    const from=fromEl?.value||'', to=toEl?.value||'';
+    const label=from&&to?`${from} → ${to}`:from?`From ${from}`:`Until ${to}`;
+    pills.push({cls:'pill-date',col:schema.primaryDate||'Date',label,
+      fn:()=>{ if(fromEl)fromEl.value=''; if(toEl)toEl.value=''; applyFilters(); }});
+  }
+  document.querySelectorAll('.dyn-filter').forEach(sel=>{
+    if(sel.value){
+      const col=sel.dataset.col, val=sel.value;
+      pills.push({cls:'',col,label:val, fn:()=>{ sel.value=''; applyFilters(); }});
+    }
+  });
+  const dynDateCols=new Set([...document.querySelectorAll('.dyn-date-from,.dyn-date-to')].filter(e=>e.value).map(e=>e.dataset.col));
+  dynDateCols.forEach(col=>{
+    const f=document.querySelector(`.dyn-date-from[data-col="${CSS.escape(col)}"]`);
+    const t=document.querySelector(`.dyn-date-to[data-col="${CSS.escape(col)}"]`);
+    const from=f?.value||'', to=t?.value||'';
+    const label=from&&to?`${from} → ${to}`:from?`From ${from}`:`Until ${to}`;
+    pills.push({cls:'pill-date',col,label,fn:()=>removeDynamicFilter(col)});
+  });
+  const dynNumCols=new Set([...document.querySelectorAll('.dyn-num-min,.dyn-num-max')].filter(e=>e.value!=='').map(e=>e.dataset.col));
+  dynNumCols.forEach(col=>{
+    const mn=document.querySelector(`.dyn-num-min[data-col="${CSS.escape(col)}"]`)?.value;
+    const mx=document.querySelector(`.dyn-num-max[data-col="${CSS.escape(col)}"]`)?.value;
+    const label=mn&&mx?`${mn} – ${mx}`:mn?`≥ ${mn}`:`≤ ${mx}`;
+    pills.push({cls:'pill-num',col,label,fn:()=>removeDynamicFilter(col)});
+  });
+  document.querySelectorAll('.dyn-text-search').forEach(el=>{
+    if(el.value.trim()){
+      const col=el.dataset.col, q=el.value.trim();
+      pills.push({cls:'pill-text',col,label:`"${q}"`,fn:()=>removeDynamicFilter(col)});
+    }
+  });
+
+  _pillClearFns=pills.map(p=>p.fn);
+  if(!pills.length){
+    container.innerHTML='';
+    document.getElementById('btn-clear-all').style.display='none';
+    document.getElementById('btn-save-preset').style.display='none';
+    return;
+  }
+  document.getElementById('btn-clear-all').style.display='';
+  document.getElementById('btn-save-preset').style.display='';
+  container.innerHTML=pills.map((p,i)=>`
+    <span class="filter-pill ${p.cls}">
+      <span class="pill-col">${p.col}:</span>
+      <span class="pill-val" title="${escAttr(p.label)}">${p.label}</span>
+      <button class="pill-x" data-pill="${i}">✕</button>
+    </span>`).join('');
+}
+
+function updateFilterBadge(){
+  let count=0;
+  if(document.getElementById('f-date-from')?.value) count++;
+  if(document.getElementById('f-date-to')?.value) count++;
+  document.querySelectorAll('.dyn-filter').forEach(s=>{if(s.value)count++;});
+  const dynCols=new Set([
+    ...[...document.querySelectorAll('.dyn-date-from,.dyn-date-to')].filter(e=>e.value).map(e=>e.dataset.col),
+    ...[...document.querySelectorAll('.dyn-num-min,.dyn-num-max')].filter(e=>e.value!=='').map(e=>e.dataset.col),
+    ...[...document.querySelectorAll('.dyn-text-search')].filter(e=>e.value.trim()).map(e=>e.dataset.col),
+  ]);
+  count+=dynCols.size;
+
+  const badge=document.getElementById('filter-badge');
+  const label=document.getElementById('filter-toggle-label');
+  const countEl=document.getElementById('filter-record-count');
+  if(count){
+    badge.textContent=count;
+    badge.style.display='';
+    label.textContent=`🔍 Filters (${count} active)`;
+    countEl.textContent=`Showing ${filteredRows.length.toLocaleString()} of ${rawRows.length.toLocaleString()} records`;
+  } else {
+    badge.style.display='none';
+    label.textContent='🔍 Filters';
+    countEl.textContent='';
+  }
+}
+
+function updateFilterSummary(){ updateFilterBadge(); updateFilterPills(); }
+
+function toggleFilterBar(){
+  const body=document.getElementById('filter-body');
+  const arrow=document.getElementById('filter-arrow');
+  const isOpen=!body.classList.contains('closed');
+  body.classList.toggle('closed',isOpen);
+  arrow.classList.toggle('closed',isOpen);
+}
+
+// ── Preset save/apply ──────────────────────────────────────
+function openSavePresetForm(){
+  const name=window.prompt('Name this preset (e.g. "March Closed Tickets"):');
+  if(!name?.trim()) return;
+  filterPresets.push({name:name.trim(),snapshot:captureFilterState()});
+  renderPresets();
+  toast(`Preset saved: "${name.trim()}"`, 'success');
+}
+
+function captureFilterState(){
+  const state={};
+  const f=document.getElementById('f-date-from'), t=document.getElementById('f-date-to');
+  if(f?.value) state.__dateFrom=f.value;
+  if(t?.value) state.__dateTo=t.value;
+  document.querySelectorAll('.dyn-filter').forEach(sel=>{
+    if(sel.value) state[sel.dataset.col]={type:'select',value:sel.value,isAgent:sel.dataset.isagent==='true'};
+  });
+  document.querySelectorAll('.dyn-date-from').forEach(el=>{
+    if(el.value){ const c=el.dataset.col; state[c]=state[c]||{}; state[c].colType='date'; state[c].dateFrom=el.value; }
+  });
+  document.querySelectorAll('.dyn-date-to').forEach(el=>{
+    if(el.value){ const c=el.dataset.col; state[c]=state[c]||{}; state[c].colType='date'; state[c].dateTo=el.value; }
+  });
+  document.querySelectorAll('.dyn-num-min').forEach(el=>{
+    if(el.value!==''){ const c=el.dataset.col; state[c]=state[c]||{}; state[c].colType='number'; state[c].numMin=el.value; }
+  });
+  document.querySelectorAll('.dyn-num-max').forEach(el=>{
+    if(el.value!==''){ const c=el.dataset.col; state[c]=state[c]||{}; state[c].colType='number'; state[c].numMax=el.value; }
+  });
+  document.querySelectorAll('.dyn-text-search').forEach(el=>{
+    if(el.value.trim()) state[el.dataset.col]={type:'text',value:el.value.trim()};
+  });
+  return state;
+}
+
+function applyPreset(idx){
+  const p=filterPresets[idx];
+  if(!p) return;
+  resetFilters(true);
+  const snap=p.snapshot;
+  const f=document.getElementById('f-date-from'), t=document.getElementById('f-date-to');
+  if(snap.__dateFrom&&f) f.value=snap.__dateFrom;
+  if(snap.__dateTo&&t)   t.value=snap.__dateTo;
+
+  const dynEntries=Object.entries(snap).filter(([k])=>!k.startsWith('__'));
+  dynEntries.forEach(([col,state])=>{
+    const autoSel=document.querySelector(`.dyn-filter[data-col="${CSS.escape(col)}"]`);
+    if(autoSel){ autoSel.value=state.value||''; return; }
+    addDynamicFilter(col);
+  });
+  setTimeout(()=>{
+    dynEntries.forEach(([col,state])=>{
+      if(state.colType==='date'){
+        if(state.dateFrom){ document.querySelector(`.dyn-date-from[data-col="${CSS.escape(col)}"]`)?.setAttribute('value',state.dateFrom); }
+        if(state.dateTo){   document.querySelector(`.dyn-date-to[data-col="${CSS.escape(col)}"]`)?.setAttribute('value',state.dateTo); }
+      } else if(state.colType==='number'){
+        if(state.numMin){ const el=document.querySelector(`.dyn-num-min[data-col="${CSS.escape(col)}"]`); if(el)el.value=state.numMin; }
+        if(state.numMax){ const el=document.querySelector(`.dyn-num-max[data-col="${CSS.escape(col)}"]`); if(el)el.value=state.numMax; }
+      } else if(state.type==='text'){
+        const el=document.querySelector(`.dyn-text-search[data-col="${CSS.escape(col)}"]`); if(el)el.value=state.value;
+      } else {
+        const sel=document.querySelector(`.dyn-filter[data-col="${CSS.escape(col)}"]`); if(sel)sel.value=state.value||'';
+      }
+    });
+    applyFilters();
+    toast(`Preset applied: "${p.name}"`, 'info');
+  }, 60);
+}
+
+function deletePreset(idx){ filterPresets.splice(idx,1); renderPresets(); }
+
+function renderPresets(){
+  const row=document.getElementById('filter-presets-row');
+  const container=document.getElementById('filter-presets');
+  if(!filterPresets.length){ row.style.display='none'; return; }
+  row.style.display='flex';
+  container.innerHTML=filterPresets.map((p,i)=>`
+    <button class="preset-btn" data-preset="${i}">
+      ⚡ ${p.name}<span class="preset-del" data-del-preset="${i}">✕</span>
+    </button>`).join('');
 }
 
 // ─────────────────────────────────────────────────────────
@@ -1489,6 +1852,43 @@ document.addEventListener('DOMContentLoaded',()=>{
       ()=>toast('Copied to clipboard','success'),
       ()=>toast('Copy failed — select text manually','error')
     );
+  });
+
+  // Filter bar toggle (collapse/expand)
+  document.getElementById('filter-toggle-btn').addEventListener('click', toggleFilterBar);
+
+  // + Add Filter panel open/close
+  document.getElementById('btn-add-filter').addEventListener('click', e=>{
+    e.stopPropagation();
+    document.getElementById('add-filter-panel').classList.toggle('open');
+  });
+  document.addEventListener('click', ()=>document.getElementById('add-filter-panel')?.classList.remove('open'));
+
+  // Remove dynamic filter widgets (event delegation)
+  document.getElementById('dynamic-filter-rows').addEventListener('click', e=>{
+    const btn=e.target.closest('.filter-widget-remove');
+    if(btn) removeDynamicFilter(btn.dataset.removeCol);
+  });
+
+  // Enter key inside dynamic filter inputs triggers apply
+  document.getElementById('dynamic-filter-rows').addEventListener('keydown', e=>{
+    if(e.key==='Enter') applyFilters();
+  });
+
+  // Filter pills (event delegation on pills container)
+  document.getElementById('filter-pills').addEventListener('click', e=>{
+    const btn=e.target.closest('.pill-x');
+    if(!btn) return;
+    const idx=parseInt(btn.dataset.pill);
+    if(!isNaN(idx)&&_pillClearFns[idx]) _pillClearFns[idx]();
+  });
+
+  // Presets (event delegation)
+  document.getElementById('filter-presets').addEventListener('click', e=>{
+    const del=e.target.closest('[data-del-preset]');
+    if(del){ e.stopPropagation(); deletePreset(parseInt(del.dataset.delPreset)); return; }
+    const btn=e.target.closest('[data-preset]');
+    if(btn) applyPreset(parseInt(btn.dataset.preset));
   });
 });
 </script>
