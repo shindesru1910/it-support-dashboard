@@ -1198,7 +1198,44 @@ function showSkeletons(){
     '</div>';
 }
 
+// ── Active dashboard filter summary ────────────────────────
+// Used to label drill-downs so the user sees that the dashboard's active
+// filters (e.g. "Assigned To: Srushti") are carried over to Data Explorer.
+function getActiveFilterSummary(){
+  const parts = [];
+  const fromEl = document.getElementById('f-date-from');
+  const toEl = document.getElementById('f-date-to');
+  if(fromEl?.value || toEl?.value){
+    const from = fromEl?.value || '', to = toEl?.value || '';
+    const dateLabel = from && to ? `${from} → ${to}` : from ? `≥ ${from}` : `≤ ${to}`;
+    parts.push(`${schema?.primaryDate||'Date'}: ${dateLabel}`);
+  }
+  document.querySelectorAll('.dyn-filter').forEach(sel=>{
+    if(sel.value) parts.push(`${sel.dataset.col}: ${sel.value}`);
+  });
+  document.querySelectorAll('.dyn-date-from,.dyn-date-to').forEach(el=>{
+    if(el.value){
+      const col = el.dataset.col;
+      if(parts.some(p=>p.startsWith(`${col}:`))) return;
+      parts.push(`${col}: date filter`);
+    }
+  });
+  document.querySelectorAll('.dyn-num-min,.dyn-num-max').forEach(el=>{
+    if(el.value!==''){
+      const col = el.dataset.col;
+      if(parts.some(p=>p.startsWith(`${col}:`))) return;
+      parts.push(`${col}: range filter`);
+    }
+  });
+  document.querySelectorAll('.dyn-text-search').forEach(el=>{
+    if(el.value.trim()) parts.push(`${el.dataset.col}: "${el.value.trim()}"`);
+  });
+  return parts.length ? parts.join(' · ') : '';
+}
+
 // ── Drill-down (chart click → Data Explorer) ───────────────
+// Inherits the dashboard's currently-applied filters by using `filteredRows`
+// as the base and stashing a snapshot in the drill-down filter.
 function applyDrilldown(col, value){
   const isAgent = schema?.agentCol === col;
   const predicate = r => {
@@ -1206,11 +1243,15 @@ function applyDrilldown(col, value){
     if(isAgent) v = cleanAgentName(v);
     return v === value;
   };
-  const count = rawRows.filter(predicate).length;
+  const base = filteredRows.length ? [...filteredRows] : [...rawRows];
+  const count = base.filter(predicate).length;
+  const summary = getActiveFilterSummary();
+  const label = summary ? `${summary} + ${col}: ${value}` : `${col}: ${value}`;
   goToDataExplorer({
-    label: `${col}: "${value}"`,
+    label,
     count,
     predicate,
+    baseRowsSnapshot: base,
   });
   toast(`Filtered: ${value} (${count.toLocaleString()} records)`,'info');
 }
@@ -1384,8 +1425,16 @@ function updateBreadcrumb(){
 // ─────────────────────────────────────────────────────────
 function getDataExplorerBaseRows(){
   if(!rawRows.length) return [];
-  if(dataExplorerFilter && typeof dataExplorerFilter.predicate === 'function'){
-    return rawRows.filter(dataExplorerFilter.predicate);
+  if(dataExplorerFilter){
+    // Use snapshot (captures dashboard filters at drill-down time) when present,
+    // otherwise fall back to all rows.
+    const base = Array.isArray(dataExplorerFilter.baseRowsSnapshot)
+      ? dataExplorerFilter.baseRowsSnapshot
+      : rawRows;
+    if(typeof dataExplorerFilter.predicate === 'function'){
+      return base.filter(dataExplorerFilter.predicate);
+    }
+    return [...base];
   }
   return [...rawRows];
 }
@@ -1399,7 +1448,15 @@ function renderDataExplorer(){
   const bannerText = document.getElementById('dx-banner-text');
   if(dataExplorerFilter){
     banner.classList.add('on');
-    bannerText.innerHTML = `🎯 Filtered view: <strong>${dataExplorerFilter.label}</strong> — showing ${baseRows.length.toLocaleString()} of ${rawRows.length.toLocaleString()} records`;
+    const snap = dataExplorerFilter.baseRowsSnapshot;
+    let countLine;
+    if(Array.isArray(snap) && snap.length !== rawRows.length){
+      // Dashboard filter was active when this drill-down was triggered
+      countLine = `showing ${baseRows.length.toLocaleString()} of ${snap.length.toLocaleString()} filtered records (${rawRows.length.toLocaleString()} total)`;
+    } else {
+      countLine = `showing ${baseRows.length.toLocaleString()} of ${rawRows.length.toLocaleString()} records`;
+    }
+    bannerText.innerHTML = `🎯 Filtered view: <strong>${dataExplorerFilter.label}</strong> — ${countLine}`;
   } else {
     banner.classList.remove('on');
   }
@@ -1975,9 +2032,16 @@ function buildKPIs(rows, sch){
   const n = rows.length;
   _kpiDrilldowns = {};
 
-  // 1. Total records — drill to all
+  // Snapshot of the filtered view at the time KPIs were rendered, plus a
+  // human-readable summary of the active dashboard filters. Carried into each
+  // drilldown so Data Explorer respects the dashboard's filters.
+  const kpiBaseSnapshot = [...rows];
+  const kpiFilterSummary = getActiveFilterSummary();
+  const composeLabel = base => kpiFilterSummary ? `${kpiFilterSummary} + ${base}` : base;
+
+  // 1. Total records — drill to all (within current filter)
   kpis.push({label:'Total Records', value:n.toLocaleString(), rawNum:n, color:'blue', icon:'📄', sub:currentFilename,
-    drilldown:{ label:'All Records', count:n, predicate:()=>true }});
+    drilldown:{ label:composeLabel('All Records'), count:n, predicate:()=>true, baseRowsSnapshot:kpiBaseSnapshot }});
 
   // 2. Status-based: open + resolution rate
   if(sch.statusCol){
@@ -1988,9 +2052,8 @@ function buildKPIs(rows, sch){
     if(openCount>0){
       const openRe = /open|active|new|pend|wip|in.prog|waiting|progress/i;
       const openPredicate = r => { const v=String(r[sch.statusCol]||'').trim(); return v && openRe.test(v); };
-      const drillCount = rawRows.filter(openPredicate).length || openCount;
       kpis.push({label:'Open / Active', value:openCount.toLocaleString(), rawNum:openCount, color:'red', icon:'🔴', sub:sch.statusCol,
-        drilldown:{ label:'Open / Active Tickets', count:drillCount, predicate:openPredicate }});
+        drilldown:{ label:composeLabel('Open / Active Tickets'), count:openCount, predicate:openPredicate, baseRowsSnapshot:kpiBaseSnapshot }});
     }
     const closedKeys  = Object.keys(cnts).filter(k=>/resolv|clos|done|complet|finish/i.test(k));
     const closedCount = closedKeys.reduce((s,k)=>s+cnts[k],0);
@@ -2001,12 +2064,11 @@ function buildKPIs(rows, sch){
       const healthLabel = rateNum>=85?'● Good':rateNum>=70?'● Needs attention':'● Critical';
       const closedRe = /resolv|clos|done|complet|finish/i;
       const closedPredicate = r => { const v=String(r[sch.statusCol]||'').trim(); return v && closedRe.test(v); };
-      const drillCount = rawRows.filter(closedPredicate).length || closedCount;
       kpis.push({label:'Resolution Rate', value:`${rate}%`, rawNum:rateNum, suf:'%', dec:true,
         color: rateNum>=85?'green':rateNum>=70?'yellow':'red',
         icon:'✅', sub:`${closedCount.toLocaleString()} resolved`,
         health:{cls:healthCls,label:healthLabel},
-        drilldown:{ label:'Resolved Tickets', count:drillCount, predicate:closedPredicate }});
+        drilldown:{ label:composeLabel('Resolved Tickets'), count:closedCount, predicate:closedPredicate, baseRowsSnapshot:kpiBaseSnapshot }});
     }
   }
 
@@ -2022,7 +2084,7 @@ function buildKPIs(rows, sch){
       const isD=avg>=24;
       const display = isD ? `${(avg/24).toFixed(1)}d` : `${avg.toFixed(1)}h`;
       kpis.push({label:'Avg Resolution', value:display, rawNum:isD?avg/24:avg, suf:isD?'d':'h', dec:true, color:'yellow', icon:'⏱', sub:`from ${times.length.toLocaleString()} records`,
-        drilldown:{ label:'Records with Resolution Time', count:times.length,
+        drilldown:{ label:composeLabel('Records with Resolution Time'), count:times.length, baseRowsSnapshot:kpiBaseSnapshot,
           predicate: r => {
             const d1=parseDate(r[sch.primaryDate]), d2=parseDate(r[sch.secondaryDate]);
             return d1 && d2 && !isNaN(d1) && !isNaN(d2) && d2 > d1;
@@ -2043,7 +2105,7 @@ function buildKPIs(rows, sch){
       else if(isHrs)  display = `${avg.toFixed(1)}h`;
       else            display = avg.toFixed(1);
       kpis.push({label:`Avg ${col}`, value:display, color:'cyan', icon:'📊', sub:`${nums.length.toLocaleString()} values`,
-        drilldown:{ label:`Records with ${col}`, count:nums.length,
+        drilldown:{ label:composeLabel(`Records with ${col}`), count:nums.length, baseRowsSnapshot:kpiBaseSnapshot,
           predicate: r => { const v=parseFloat(String(r[col]||'').replace(/[,$%\s]/g,'')); return !isNaN(v) && v >= 0; } }});
     }
   }
